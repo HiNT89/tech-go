@@ -1,0 +1,107 @@
+.wrapper {
+  width: 100%;
+  background: rgb(179, 179, 179);
+}
+.banner_top {
+  width: calc(100% - 252px);
+  height: 379px;
+  margin-left: 20%;
+  margin-top: 10px;
+}
+.banner_top_left {
+  flex-grow: 1;
+  height: 100%;
+  border-radius: 8px;
+  position: relative;
+  > img {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+  }
+}
+.slide_controls {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0px;
+  right: 0;
+  bottom: 0;
+  background-color: transparent;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  overflow: hidden;
+}
+.slide_control {
+  display: none;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.4);
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  color: #fff;
+  &:hover {
+    background-color: #fff;
+    color: rgba(0, 0, 0, 0.7);
+  }
+}
+.banner_top_right {
+  height: 100%;
+  max-width: 33.33%;
+}
+
+.dot {
+  transition: all 0.3s linear;
+}
+.banner_bottom {
+  width: 100%;
+  margin-top: 16px;
+}
+.category_item {
+  border: 0.5px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-transform: capitalize;
+  background-color: #fff;
+  padding: 15px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  &:hover {
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.15);
+  }
+}
+.flycamBtn .btn_control {
+  width: 40px;
+  height: 40px;
+  background-color: #fff;
+  border-radius: 50%;
+  padding: 0;
+  min-width: 0;
+  font-size: 1.4rem;
+  color: #000000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &:hover {
+    background-color: #fabb00;
+    color: #fff;
+  }
+}
+.flyCamItem {
+  width: calc(25% - 20px);
+  border-bottom: 1px solid #ccc;
+  padding: 8px 0px;
+}
+.btnTrend > button {
+  width: 90%;
+}
+.btn_contact {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+}

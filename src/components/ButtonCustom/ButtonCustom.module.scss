@@ -1,0 +1,33 @@
+.wrapper {
+    position: relative;
+    overflow: hidden;
+    min-width: 30%;
+    height: 50px;
+    > div {
+      position: absolute;
+      z-index: 5;
+      width: 100%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    &:hover > span {
+      left: -5%;
+      display: block;
+    }
+    &:hover > div {
+      color: #fff;
+    }
+    > span {
+      position: absolute;
+      top: 0;
+      left: -125%;
+      z-index: 2;
+      display: block;
+      width: 120%;
+      height: 100%;
+      background: #fabb00;
+      transform: skewX(-25deg);
+      transition: all 2s;
+    }
+  }

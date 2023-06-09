@@ -1,0 +1,13 @@
+.wrapper {
+  overflow: hidden;
+  cursor: pointer;
+  border-radius: 6px;
+  &:hover img {
+    transform: scale(1.2);
+  }
+  img {
+    width: 100%;
+    border-radius: 6px;
+    transition: all 0.3s;
+  }
+}

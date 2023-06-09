@@ -1,0 +1,56 @@
+.leftIn {
+    display: flex;
+    animation: leftIn linear .5s 1 backwards;
+}
+.rightIn {
+    display: flex;
+    animation: rightIn linear .5s 1 backwards;
+}
+.leftOut {
+    display: flex;
+    animation: leftOut linear .5s 1 forwards;
+}
+.rightOut {
+    display: flex;
+    animation: rightOut linear .5s 1 forwards;
+}
+@keyframes leftIn {
+    from {
+        transform: translateX(-100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0px);
+        opacity: 1;
+    }
+}
+@keyframes rightIn {
+    from {
+        transform: translateX(+100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0px);
+        opacity: 1;
+    }
+}
+@keyframes leftOut {
+    to {
+        transform: translateX(-100px);
+        opacity: 0;
+    }
+    from {
+        transform: translateX(0px);
+        opacity: 1;
+    }
+}
+@keyframes rightOut {
+    to {
+        transform: translateX(+100px);
+        opacity: 0;
+    }
+    from {
+        transform: translateX(0px);
+        opacity: 1;
+    }
+}

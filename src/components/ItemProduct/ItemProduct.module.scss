@@ -1,0 +1,79 @@
+.item_btn {
+  position: relative;
+  &:hover .item_btn_icon {
+    position: relative;
+    width: 140px;
+    transition: all 0.3s;
+    svg {
+      left: 12px;
+      position: absolute;
+    }
+  }
+  &:hover .item_btn_text {
+    transition: all 0.3s;
+    color: #fff;
+  }
+  > .item_btn_text {
+    position: absolute;
+    left: 35px;
+    width: 130px;
+  }
+}
+.item_top {
+  overflow: hidden;
+  position: relative;
+  padding: 2px;
+  > span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    display: block;
+    border-radius: 50%;
+    background-color: #fff;
+    color: rgba(84, 79, 79, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 5;
+    transition: all 2s;
+    &:hover {
+      background-color: rgba(63, 54, 54, 1);
+      color: #fff;
+    }
+  }
+  > div {
+    width: 100%;
+    position: absolute;
+    height: 100%;
+    transform: translateX(100%);
+    transition: all 1s 0.1s;
+    border-radius: 6px;
+  }
+  &:hover > .thumb {
+    transform: translateX(-100%);
+    transition: all 1s;
+  }
+  &:hover > div {
+    transform: translateX(0);
+  }
+  &:hover > span {
+    display: flex;
+  }
+  .thumbIn {
+    animation: thumbIn linear 1s backwards;
+  }
+}
+@keyframes thumbIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+}
+.product_name {
+  min-height: 50px;
+}
