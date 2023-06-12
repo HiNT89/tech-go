@@ -8,6 +8,7 @@ import ItemProduct from "~/components/ItemProduct";
 import { numberToArray } from "~/function";
 import { FaAngleDoubleLeft, FaAngleDoubleRight } from "react-icons/fa";
 import Empty from "./empty";
+import Pagination from "~/components/Pagination";
 function Search() {
   const [showNav, setShowNav] = useState(false);
   const [page, setPage] = useState({
@@ -18,7 +19,15 @@ function Search() {
   const toggleShowNav = () => {
     setShowNav(!showNav);
   };
-
+  const handlePrevPage = () => {
+    setPage({ ...page, pageIndex: page.pageIndex - 1 });
+  };
+  const handleChangePage = (it: number) => {
+    setPage({ ...page, pageIndex: it });
+  };
+  const handleNextPage = () => {
+    setPage({ ...page, pageIndex: page.pageIndex + 1 });
+  };
   return (
     <>
       <Header isShowNav={showNav} toggleNav={toggleShowNav} />
@@ -42,47 +51,12 @@ function Search() {
             ))}
           </div>
           <div className="flex justify-center items-center mt-8">
-            <div className="flex gap-2">
-              {page.pageIndex > 1 ? (
-                <button
-                  className={clsx(
-                    "w-8 h-8 border flex justify-center items-center text-lg font-bold hover:bg-blue-600 hover:text-white"
-                  )}
-                  onClick={() =>
-                    setPage({ ...page, pageIndex: page.pageIndex - 1 })
-                  }
-                >
-                  <FaAngleDoubleLeft />
-                </button>
-              ) : (
-                ""
-              )}
-              {numberToArray(page.sumPage).map((it) => (
-                <button
-                  className={clsx(
-                    "w-8 h-8 border flex justify-center items-center text-lg font-bold hover:bg-blue-600 hover:text-white",
-                    it === page.pageIndex ? "bg-amber-400 text-white" : ""
-                  )}
-                  onClick={() => setPage({ ...page, pageIndex: it })}
-                >
-                  {it}
-                </button>
-              ))}
-              {page.pageIndex < page.sumPage ? (
-                <button
-                  className={clsx(
-                    "w-8 h-8 border flex justify-center items-center text-lg font-bold hover:bg-blue-600 hover:text-white"
-                  )}
-                  onClick={() =>
-                    setPage({ ...page, pageIndex: page.pageIndex + 1 })
-                  }
-                >
-                  <FaAngleDoubleRight />
-                </button>
-              ) : (
-                ""
-              )}
-            </div>
+            <Pagination
+              page={page}
+              handlePrevPage={handlePrevPage}
+              handleNextPage={handleNextPage}
+              handleChangePage={handleChangePage}
+            />
           </div>
         </main>
       ) : (

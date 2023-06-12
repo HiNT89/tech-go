@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import styles from "./Detail.module.scss";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import Header from "~/components/Header";
 import Footer from "~/components/Footer";
@@ -16,11 +16,11 @@ import {
   FaShippingFast,
   FaPhoneVolume,
 } from "react-icons/fa";
-import { AiFillLike,AiOutlineRollback } from "react-icons/ai";
+import { AiFillLike, AiOutlineRollback } from "react-icons/ai";
 import ProductSale from "../Home/components/ProductSale";
-import {BsShieldCheck} from 'react-icons/bs'
+import { BsShieldCheck } from "react-icons/bs";
 import { VND } from "~/function";
-import banner from '~/assets/imgs/product_banner.jpg'
+import banner from "~/assets/imgs/product_banner.jpg";
 function Detail() {
   const [showNav, setShowNav] = useState(false);
   const toggleShowNav = () => {
@@ -33,7 +33,10 @@ function Detail() {
     imgURL: "",
   });
   const [color, setColor] = useState(product.color[0]);
-  const [changeColor,setChangeColor] = useState(product.color[0])
+  const [changeColor, setChangeColor] = useState(product.color[0]);
+  const colorRef = useRef(product.color[0]);
+  const [statusBtnControl, setStatusBtnControl] = useState(0);
+
   //  effect
   useEffect(() => {
     const slideFind = product.productIMG.filter(
@@ -44,7 +47,12 @@ function Detail() {
       imgURL: slideFind.imgURL,
     });
   }, [slide.index]);
-  const [statusBtnControl, setStatusBtnControl] = useState(0);
+  useEffect(() => {
+    setChangeColor(color);
+    colorRef.current = color;
+    const objImg = product.productIMG.filter((it) => it.name === color)[0];
+    setSlide({ index: objImg.id, name: objImg.name, imgURL: objImg.imgURL });
+  }, [color]);
   // function
   const handleNextSlide = (): void => {
     const indexEnd = product.productIMG.length;
@@ -71,7 +79,7 @@ function Detail() {
     }
     return result;
   };
-  
+  console.log(colorRef.current);
   return (
     <>
       <Header isShowNav={showNav} toggleNav={toggleShowNav} />
@@ -183,7 +191,11 @@ function Detail() {
                     className={clsx(
                       "w-10 h-10 rounded-full flex justify-center items-center "
                     )}
-                    onMouseMove={() =>setChangeColor(it)}
+                    onMouseMove={() => setChangeColor(it)}
+                    onMouseLeave={() => setChangeColor(colorRef.current)}
+                    onClick={() => {
+                      setColor(it);
+                    }}
                   >
                     {it === color ? (
                       <span className="text-yellow-500 bg-white inline-block w-6 h-6 rounded-full flex justify-center items-center">
@@ -273,27 +285,26 @@ function Detail() {
         </div>
         {/* ---- */}
         <ProductSale
-        title={"Sản phẩm liên quan"}
-        childrenTop={""}
-        buttonBottom={""}
-        dataUI={{
-          bgColorWrapper: "#fff",
-          bgColorItem: "#fff",
-          colorTitle: "#000",
-        }}
-      />
-      {/* ----- */}
-      <ProductSale
-        title={"Sản phẩm đã xem"}
-        childrenTop={""}
-        buttonBottom={""}
-        dataUI={{
-          bgColorWrapper: "#fff",
-          bgColorItem: "#fff",
-          colorTitle: "#000",
-        }}
-      />
-       
+          title={"Sản phẩm liên quan"}
+          childrenTop={""}
+          buttonBottom={""}
+          dataUI={{
+            bgColorWrapper: "#fff",
+            bgColorItem: "#fff",
+            colorTitle: "#000",
+          }}
+        />
+        {/* ----- */}
+        <ProductSale
+          title={"Sản phẩm đã xem"}
+          childrenTop={""}
+          buttonBottom={""}
+          dataUI={{
+            bgColorWrapper: "#fff",
+            bgColorItem: "#fff",
+            colorTitle: "#000",
+          }}
+        />
       </main>
       <Footer />
     </>

@@ -1,0 +1,39 @@
+// @import '~@tiptap/starter-kit/style.css';
+
+// .ProseMirror {
+//   padding: 10px;
+//   background-color: white;
+//   border-radius: 5px;
+//   border: 1px solid #ddd;
+// }
+// -----------
+.wrapper {
+  width: 100%;
+  height: 100vh;
+  overflow: auto;
+}
+.wrapper_customer,.wrapper_order,.wrapper_product {
+  table {
+    max-width: 100%;
+    overflow: auto;
+    img {
+      width: 100px;
+      height: 100px;
+    }
+  }
+  td,th {
+  
+    border: 2px solid red;
+    text-align: center;
+  }
+  
+}
+.content {
+  > div {
+ 
+    width: 100%;
+    border-radius: 8px;
+    background-color: #ccc;
+  
+  }
+}
