@@ -141,6 +141,7 @@ const listNav = [
   },
   {
     content: "điện máy - điện gia dụng",
+    type: "",
     isShowHover: true,
     subNav: [
       {
@@ -242,42 +243,47 @@ const listNav = [
   },
   {
     content: "tivi - màn hình TV",
+    type: "tv",
     isShowHover: false,
   },
   {
     content: "điện thoại",
+    type: "phone",
     isShowHover: false,
   },
   {
-    content: "PC - máy tình bộ",
+    content: "PC - máy tính bộ",
+    type: "pc",
     isShowHover: false,
   },
   {
     content: "màn hình máy tình",
+    type: "screenPC",
     isShowHover: false,
   },
   {
     content: "phụ kiện & thiết bị ngoại vi",
+    type: "accessory",
     isShowHover: false,
   },
   {
     content: "máy ảnh",
-    isShowHover: false,
-  },
-  {
-    content: "máy quay phim",
+    type: "camera",
     isShowHover: false,
   },
   {
     content: "thiết bị văn phòng",
+    type: "officeEquipment",
     isShowHover: false,
   },
   {
     content: "thiết bị thông minh",
+    type: "smartDevice",
     isShowHover: false,
   },
   {
     content: "laptop & macbook",
+    type: "laptop",
     isShowHover: true,
     subNav: [
       {
@@ -398,18 +404,22 @@ const listNav = [
   },
   {
     content: "giải pháp doanh nghiệp",
+    type: "enterpriseSolutions",
     isShowHover: false,
   },
   {
     content: "đồng hồ thông minh",
+    type: "smartWatch",
     isShowHover: false,
   },
   {
     content: "link kiện máy tính",
+    type: "computerComponents",
     isShowHover: false,
   },
   {
     content: "thiết bị mạng",
+    type: "networkEquipment",
     isShowHover: false,
   },
 ];

@@ -1,11 +1,10 @@
 import clsx from "clsx";
 import styles from "./Detail.module.scss";
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Header from "~/components/Header";
 import Footer from "~/components/Footer";
 import "./style.css";
-import { data } from "~/db";
 import {
   FaAngleRight,
   FaAngleLeft,
@@ -17,57 +16,141 @@ import {
   FaPhoneVolume,
 } from "react-icons/fa";
 import { AiFillLike, AiOutlineRollback } from "react-icons/ai";
-import ProductSale from "../Home/components/ProductSale";
+import Products from "../Home/components/Products";
 import { BsShieldCheck } from "react-icons/bs";
 import { VND } from "~/function";
 import banner from "~/assets/imgs/product_banner.jpg";
+import { useDispatch, useSelector } from "react-redux";
+import { listProductSE, userSE } from "~/rootSaga/selectors";
+import ButtonBackToTop from "~/components/ButtonBackToTop";
+
+import {
+  actionCreateDataCart,
+  actionGetDataCart,
+  actionGetProduct,
+} from "~/pages/saga/action";
+interface Action {
+  type: string;
+  payload: {};
+}
+const dataDefault = {
+  productName: "",
+  nsx: "",
+  price: 0,
+  sale: 0,
+  percentSale: 0,
+  description: "",
+  productID: "",
+  type: "",
+  count: [
+    {
+      id: "",
+      color: "đen",
+      count: 1,
+      remaining: 1,
+      imgURL:
+        "https://firebasestorage.googleapis.com/v0/b/techgo-b1a51.appspot.com/o/product_12_1_f5ccbd4611264aa689ade7ac66582992_343191087259479a81b8e9e878d6abd1_master.png?alt=media&token=64a68e34-88c9-4f23-8a34-5636a61de2f1",
+      codeColor: "#000",
+    },
+  ],
+  id: "1",
+};
+
 function Detail() {
+  const user = useSelector(userSE);
+  const dispatch = useDispatch();
+  const { v4: uuidv4 } = require("uuid");
+  const { productID } = useParams();
+  const listProduct = useSelector(listProductSE);
+  if (!(listProduct.length - 1)) {
+    dispatch<Action>(actionGetProduct());
+  }
+
   const [showNav, setShowNav] = useState(false);
   const toggleShowNav = () => {
     setShowNav(!showNav);
   };
-  const [product, setProduct] = useState(data[0]);
-  const [slide, setSlide] = useState({
-    index: 1,
-    name: "",
-    imgURL: "",
-  });
-  const [color, setColor] = useState(product.color[0]);
-  const [changeColor, setChangeColor] = useState(product.color[0]);
-  const colorRef = useRef(product.color[0]);
-  const [statusBtnControl, setStatusBtnControl] = useState(0);
 
+  const [product, setProduct] = useState(
+    listProduct.filter((it) => it.id === productID)[0] || dataDefault
+  );
+  const [slide, setSlide] = useState({
+    ...product.count[0],
+    index: 0,
+  });
+  const [isStocking, setIsStocking] = useState(true);
+  const [order, setOrder] = useState({
+    count: 1,
+    productID: product.id,
+    color: slide.color,
+    status: "processing",
+  });
+  const [color, setColor] = useState(product.count[0].color);
+  const [changeColor, setChangeColor] = useState(product.count[0].color);
+  const colorRef = useRef(product.count[0].color);
+  const [statusBtnControl, setStatusBtnControl] = useState(0);
+  const [dataComponents, setDataComponents] = useState({
+    productSale: listProduct.filter((it) => +it.sale),
+  });
   //  effect
   useEffect(() => {
-    const slideFind = product.productIMG.filter(
-      (it) => it.id === slide.index
-    )[0];
+    window.scrollTo(0, 0);
+  }, []);
+  useEffect(() => {
+    const slideFind = product.count.filter((it) => it.id === slide.id)[0];
     setSlide({
-      ...slide,
-      imgURL: slideFind.imgURL,
+      ...slideFind,
+      index: slide.index,
     });
   }, [slide.index]);
   useEffect(() => {
     setChangeColor(color);
     colorRef.current = color;
-    const objImg = product.productIMG.filter((it) => it.name === color)[0];
-    setSlide({ index: objImg.id, name: objImg.name, imgURL: objImg.imgURL });
+    const objImg = product.count.filter((it) => it.color === color)[0];
+    const index = product.count.findIndex((it) => it.color === color);
+    setSlide({ index: index, ...objImg });
+    setOrder({
+      ...order,
+      color: color,
+      count: 1,
+    });
+    setIsStocking(
+      !!product.count.filter((it) => it.color === color)[0].remaining
+    );
   }, [color]);
+  useEffect(() => {
+    const productNew =
+      listProduct.filter((it) => it.id === productID)[0] || dataDefault;
+    setProduct(productNew);
+    setSlide({
+      ...productNew.count[0],
+      index: 0,
+    });
+    setOrder({
+      count: 1,
+      productID: productNew.id,
+      color: slide.color,
+      status: "processing",
+    });
+    setColor(productNew.count[0].color);
+    setChangeColor(productNew.count[0].color);
+    colorRef.current = productNew.count[0].color;
+  }, [productID, listProduct]);
   // function
   const handleNextSlide = (): void => {
-    const indexEnd = product.productIMG.length;
-    if (indexEnd === slide.index) {
-      setSlide({ ...slide, index: 1 });
+    const indexEnd = product.count.length;
+    if (indexEnd - 1 === slide.index) {
+      setSlide({ ...product.count[0], index: 0 });
     } else {
-      setSlide({ ...slide, index: slide.index + 1 });
+      setSlide({ ...product.count[slide.index + 1], index: slide.index + 1 });
     }
   };
   const handlePrevSlide = (): void => {
-    const indexEnd = product.productIMG.length;
-    if (slide.index === 1) {
-      setSlide({ ...slide, index: indexEnd });
+    const indexEnd = product.count.length;
+    if (slide.index === 0) {
+      setSlide({ ...product.count[indexEnd - 1], index: indexEnd - 1 });
     } else {
-      setSlide({ ...slide, index: slide.index - 1 });
+      setSlide({ ...product.count[slide.index - 1], index: slide.index - 1 });
     }
   };
   const handleStatusBtnControl = (status: number, typeBtn: string): string => {
@@ -79,11 +162,33 @@ function Detail() {
     }
     return result;
   };
-  console.log(colorRef.current);
+  const handleAddProductToCart = () => {
+    const payload = {
+      account: user.account,
+      data: {
+        id: uuidv4(),
+        count: order.count,
+        productID: order.productID,
+        color: order.color,
+      },
+    };
+    dispatch<Action>(actionCreateDataCart(payload));
+  };
+  const [isShowBtnToTop, setIsShowBtnToTop] = useState(false);
+  useEffect(() => {
+    window.addEventListener("scroll", () => {
+      if (window.pageYOffset > 300) {
+        setIsShowBtnToTop(true);
+      } else {
+        setIsShowBtnToTop(false);
+      }
+    });
+  }, []);
   return (
     <>
       <Header isShowNav={showNav} toggleNav={toggleShowNav} />
-      <main className="w-full px-4 bg-gray-200 pb-5">
+      <main className="w-full px-4 bg-gray-200 pb-5 relative">
+        <ButtonBackToTop isShowBtnToTop={isShowBtnToTop} />
         {/* ---  */}
         <div className="w-full capitalize text-sm font-normal py-2 flex gap-2">
           <Link to="/">trang chủ</Link>
@@ -102,7 +207,7 @@ function Detail() {
               <div className={clsx(styles.product_img_top_sale)}>
                 <span>- {product.percentSale} %</span> OFF
               </div>
-              <img src={product.productIMG[slide.index - 1].imgURL} />
+              <img src={product.count[slide.index].imgURL} />
               <div
                 className={clsx(styles.slide_controls, "px-2")}
                 onMouseOver={() => setStatusBtnControl(1)}
@@ -133,20 +238,21 @@ function Detail() {
               </div>
             </div>
             <div className={clsx(styles.product_img_bottom)}>
-              {product.productIMG.map((it) => (
+              {product.count.map((it) => (
                 <button
-                  onClick={() =>
+                  onClick={() => {
                     setSlide({
-                      index: it.id,
-                      imgURL: it.imgURL,
-                      name: it.name,
-                    })
-                  }
+                      ...it,
+                      index: product.count.findIndex(
+                        (item) => item.id === it.id
+                      ),
+                    });
+                  }}
                 >
                   <img
                     src={it.imgURL}
                     className={clsx(
-                      slide.index === it.id
+                      slide.id === it.id
                         ? "border-amber-500"
                         : "border-gray-400",
                       "border"
@@ -160,7 +266,10 @@ function Detail() {
             <h2 className="text-2xl font-bold mb-2">{product.productName}</h2>
             <div className="capitalize flex gap-2 items-center">
               <span>
-                tình trạng : <b className="text-amber-500">Còn hàng</b>
+                tình trạng :
+                <b className="text-amber-500">
+                  {isStocking ? "Còn hàng" : "hết hàng"}
+                </b>
               </span>
               <div className="w-0.5 h-4 bg-gray-500"></div>
               <span>
@@ -169,15 +278,26 @@ function Detail() {
             </div>
             <div className="bg-gray-200 capitalize rounded-lg p-4 flex items-center w-11/12 my-3">
               <b className="w-1/6 ">giá :</b>
+
               <b className="text-3xl w-1/3 text-right pr-3 text-red-600 font-semibold">
-                {VND.format(+product.sale)}
+                {product.sale
+                  ? VND.format(+product.sale)
+                  : VND.format(+product.price)}
               </b>
-              <del className="text-lg font-normal text-gray-600">
-                {VND.format(+product.price)}
-              </del>
-              <span className="border rounded border-red-500 px-2 ml-2 text-red-500 font-semibold text-sm py-1">
-                - {product.percentSale} %
-              </span>
+              {product.sale ? (
+                <del className="text-lg font-normal text-gray-600 mx-4">
+                  {VND.format(+product.price)}
+                </del>
+              ) : (
+                ""
+              )}
+              {product.sale ? (
+                <span className="border rounded border-red-500 px-2 ml-2 text-red-500 font-semibold text-sm py-1">
+                  - {product.percentSale} %
+                </span>
+              ) : (
+                ""
+              )}
             </div>
             <div className="flex items-center py-2 capitalize gap-4 pl-4">
               <div className="flex flex-col text-sm font-bold">
@@ -185,19 +305,19 @@ function Detail() {
                 <span>{changeColor}</span>
               </div>
               <div className="flex gap-4">
-                {product.color.map((it) => (
+                {product.count.map((it) => (
                   <div
-                    style={{ backgroundColor: `${it}` }}
+                    style={{ backgroundColor: `${it.codeColor}` }}
                     className={clsx(
-                      "w-10 h-10 rounded-full flex justify-center items-center "
+                      "w-10 h-10 rounded-full flex justify-center items-center border "
                     )}
-                    onMouseMove={() => setChangeColor(it)}
+                    onMouseMove={() => setChangeColor(it.color)}
                     onMouseLeave={() => setChangeColor(colorRef.current)}
                     onClick={() => {
-                      setColor(it);
+                      setColor(it.color);
                     }}
                   >
-                    {it === color ? (
+                    {it.color === color ? (
                       <span className="text-yellow-500 bg-white inline-block w-6 h-6 rounded-full flex justify-center items-center">
                         <FaCheck />{" "}
                       </span>
@@ -208,28 +328,54 @@ function Detail() {
                 ))}
               </div>
             </div>
-            <div className="flex gap-4 capitalize py-4 font-bold pl-4 items-center">
-              <span>số lượng : </span>
-              <div className="flex">
-                <button className="bg-gray-300  w-10 h-10 flex justify-center items-center hover:bg-amber-400">
-                  <FaMinus />
-                </button>
-                <div className="w-10 h-10 bg-white  text-xl font-bold border items-center justify-center flex">
-                  1
+            {isStocking ? (
+              <>
+                <div className="flex gap-4 capitalize py-4 font-bold pl-4 items-center">
+                  <span>số lượng : </span>
+                  <div className="flex">
+                    <button
+                      className="bg-gray-300  w-10 h-10 flex justify-center items-center hover:bg-amber-400"
+                      onClick={() => {
+                        const newCount =
+                          order.count === 1 ? order.count : order.count - 1;
+
+                        setOrder({ ...order, count: newCount });
+                      }}
+                    >
+                      <FaMinus />
+                    </button>
+                    <div className="w-10 h-10 bg-white  text-xl font-bold border items-center justify-center flex">
+                      {order.count}
+                    </div>
+                    <button
+                      className="bg-gray-300  w-10 h-10 flex justify-center items-center hover:bg-amber-400"
+                      onClick={() => {
+                        const newCount =
+                          order.count < slide.remaining
+                            ? order.count + 1
+                            : order.count;
+                        setOrder({ ...order, count: newCount });
+                      }}
+                    >
+                      <FaPlus />
+                    </button>
+                  </div>
                 </div>
-                <button className="bg-gray-300  w-10 h-10 flex justify-center items-center hover:bg-amber-400">
-                  <FaPlus />
-                </button>
-              </div>
-            </div>
-            <div className="flex justify-between  mt-4 pr-4">
-              <button className="w-2/5 py-3 rounded-xl bg-white text-red-600 border border-red-600 capitalize font-semibold hover:bg-red-600 hover:text-white">
-                thêm vào giỏ hàng
-              </button>
-              <button className="w-2/5 py-3 rounded-xl bg-red-700 text-white border border-red-600 capitalize font-semibold hover:text-red-600 hover:bg-white">
-                mua ngay
-              </button>
-            </div>
+                <div className="flex justify-between  mt-4 pr-4">
+                  <button
+                    className="w-2/5 py-3 rounded-xl bg-white text-red-600 border border-red-600 capitalize font-semibold hover:bg-red-600 hover:text-white"
+                    onClick={handleAddProductToCart}
+                  >
+                    thêm vào giỏ hàng
+                  </button>
+                  <button className="w-2/5 py-3 rounded-xl bg-red-700 text-white border border-red-600 capitalize font-semibold hover:text-red-600 hover:bg-white">
+                    mua ngay
+                  </button>
+                </div>
+              </>
+            ) : (
+              ""
+            )}
           </div>
           <div className={clsx(styles.product_policy)}>
             <div className=" border border-gray-600 flex flex-col gap-4 rounded-lg text-sm p-4 mb-5">
@@ -283,8 +429,12 @@ function Detail() {
             <img src={banner} alt="" />
           </div>
         </div>
+        <div
+          className="p-4 bg-white mt-6 rounded-lg"
+          dangerouslySetInnerHTML={{ __html: product.description }}
+        />
         {/* ---- */}
-        <ProductSale
+        <Products
           title={"Sản phẩm liên quan"}
           childrenTop={""}
           buttonBottom={""}
@@ -293,9 +443,10 @@ function Detail() {
             bgColorItem: "#fff",
             colorTitle: "#000",
           }}
+          data={dataComponents.productSale}
         />
         {/* ----- */}
-        <ProductSale
+        <Products
           title={"Sản phẩm đã xem"}
           childrenTop={""}
           buttonBottom={""}
@@ -304,6 +455,7 @@ function Detail() {
             bgColorItem: "#fff",
             colorTitle: "#000",
           }}
+          data={dataComponents.productSale}
         />
       </main>
       <Footer />

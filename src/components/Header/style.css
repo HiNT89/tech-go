@@ -1,0 +1,30 @@
+.navMbIn {
+  animation: in linear 1s forwards;
+  z-index: 400;
+  display: flex !important;
+}
+.navMbOut {
+  animation: out linear 1s forwards;
+  display: flex !important;
+  z-index: 400;
+}
+@keyframes in {
+  from {
+    transform: translate(-370px, 100%);
+    /* display: none; */
+  }
+  to {
+    transform: translate(0px, 100%);
+    /* display: flex !important ; */
+  }
+}
+@keyframes out {
+  to {
+    transform: translate(-390px, 100%);
+    /* display: none; */
+  }
+  from {
+    transform: translate(0px, 100%);
+    /* display: flex !important; */
+  }
+}

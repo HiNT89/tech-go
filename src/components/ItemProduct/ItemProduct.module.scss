@@ -47,11 +47,18 @@
   > div {
     width: 100%;
     position: absolute;
-    height: 100%;
+    height: calc(100% - 32px);
     transform: translateX(100%);
     transition: all 1s 0.1s;
     border-radius: 6px;
   }
+  // > div > img,
+  // .thumb {
+  //   min-width: 168px;
+  //   min-height: 197px;
+  //   width: 100%;
+  //   height: 100%;
+  // }
   &:hover > .thumb {
     transform: translateX(-100%);
     transition: all 1s;

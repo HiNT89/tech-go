@@ -7,12 +7,23 @@ import { navs } from "./dataUI";
 import { FaShoppingBasket, FaUserAlt, FaLaptop } from "react-icons/fa";
 import DetailOrder from "./Order/detailOrder";
 import DetailProduct from "./Product/detailProduct";
+import { actionGetDataOrder, actionGetUser } from "~/pages/saga/action";
+import { useDispatch, useSelector } from "react-redux";
+import { orderSE } from "~/rootSaga/selectors";
+interface Action {
+  type: string;
+  payload: any;
+}
 function Admin() {
+  const dispatch = useDispatch();
   const [page, setPage] = useState(navs[0]);
-  const URL = window.location.pathname;
-  // console.log(path, URL);
+  const orderData = useSelector(orderSE);
   const { productID, orderID } = useParams();
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  useEffect(() => {
+    const URL = window.location.pathname;
     if (orderID) {
       setPage({
         id: 2,
@@ -26,14 +37,18 @@ function Admin() {
         id: 3,
         name: "product",
         icon: <FaLaptop />,
-        element: <DetailProduct productID={productID} />,
-        path : '/admin/product'
+        element: <DetailProduct />,
+        path: "/admin/product",
       });
-    }else {
+    } else {
       const navItem = navs.filter((it) => it.path === URL)[0];
       setPage(navItem);
     }
-  }, [URL]);
+  }, [window.location.pathname]);
+  useEffect(() => {
+    dispatch<Action>(actionGetDataOrder("all"));
+    dispatch<Action>(actionGetUser());
+  }, []);
   return (
     <div className={clsx(styles.wrapper, "flex ")}>
       <nav className={clsx(styles.nav, "w-1/5  bg-black py-4 text-white")}>
@@ -42,7 +57,7 @@ function Admin() {
         </h1>
         <ul className="w-11/12 m-auto flex flex-col gap-6 text-lg font-semibold">
           {navs.map((it) => (
-            <Link to={it.path}>
+            <Link key={it.id} to={it.path}>
               <li
                 className={clsx(
                   it.name === page.name ? "text-blue-400" : "",

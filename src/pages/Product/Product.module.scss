@@ -23,12 +23,21 @@
   }
 }
 .box_sort {
-    &:hover > div {
-        display: flex;
-    }
+  &:hover > div {
+    display: flex;
+  }
   > div {
     bottom: 0;
     transform: translateY(100%);
     display: none;
+  }
+}
+.wrapper_item {
+  width: calc(20% - 12px);
+  background-color: #fff;
+  img {
+    width: 170px;
+    height: 187px;
+    object-fit: contain;
   }
 }

@@ -1,6 +1,7 @@
 .wrapper {
   width: 100%;
   background: rgb(179, 179, 179);
+  position: relative;
 }
 .banner_top {
   width: calc(100% - 252px);
@@ -96,6 +97,11 @@
   width: calc(25% - 20px);
   border-bottom: 1px solid #ccc;
   padding: 8px 0px;
+  > div > img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+  }
 }
 .btnTrend > button {
   width: 90%;
@@ -104,4 +110,38 @@
   position: fixed;
   right: 1rem;
   bottom: 1rem;
+}
+.wrapper_product_album {
+  width: calc(20% - 16px);
+  height: calc(50% - 8px);
+  background-color: #fff;
+  img {
+    width: 168px;
+    height: 197px;
+    object-fit: contain;
+  }
+}
+@media only screen and (max-width: 376px) {
+  .banner_top {
+    width: calc(100% + 28px);
+    flex-wrap: wrap;
+    margin: 10px -14px;
+    height: auto;
+    .banner_top_left {
+      width: 100%;
+    }
+    .banner_top_right {
+      flex-direction: row;
+      max-width: 100%;
+      gap: 0px 4px;
+    }
+  }
+  .banner_bottom {
+    width: 100%;
+    flex-wrap: wrap;
+    padding: 0;
+    > a {
+      width: calc(50% - 16px);
+    }
+  }
 }

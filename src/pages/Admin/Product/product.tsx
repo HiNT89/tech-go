@@ -1,22 +1,45 @@
 import clsx from "clsx";
 import styles from "../Admin.module.scss";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Pagination from "~/components/Pagination";
-import { numberToArray } from "~/function";
+import { VND } from "~/function";
 import { Link } from "react-router-dom";
-import { data } from "~/db";
-import CreateProduct from "./createProduct";
-// import { v4 as uuidv4 } from "uuid"
-const listData = numberToArray(20);
-
+import EditProduct from "./editProduct";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  actionCreateProduct,
+  actionGetProduct,
+  actionDeleteProduct,
+} from "../../saga/action";
+import { listProductSE, userSE } from "~/rootSaga/selectors";
+interface Action {
+  type: string;
+  payload: any;
+}
 function Product() {
+  const dispatch = useDispatch();
+  const listProduct = useSelector(listProductSE);
+  const user = useSelector(userSE);
   const [page, setPage] = useState({
     pageIndex: 1,
-    listData: listData.slice(0, 5),
-    sumPage: Math.floor(listData.length / 5),
+    listData: listProduct.slice(0, 5),
+    sumPage: Math.ceil(listProduct.length / 5),
   });
 
-  const [isCreate, setIsCreate] = useState(true);
+  useEffect(() => {
+    setPage({
+      pageIndex: 1,
+      listData: listProduct.slice(0, 5),
+      sumPage: Math.ceil(listProduct.length / 5),
+    });
+  }, [listProduct]);
+  useEffect(() => {
+    setPage({
+      ...page,
+      listData: listProduct.slice((page.pageIndex - 1) * 5, page.pageIndex * 5),
+    });
+  }, [page.pageIndex]);
+  const [isCreate, setIsCreate] = useState(false);
   const handlePrevPage = () => {
     setPage({ ...page, pageIndex: page.pageIndex - 1 });
   };
@@ -29,10 +52,56 @@ function Product() {
   const handleToggleCreate = () => {
     setIsCreate(!isCreate);
   };
+  const submitBtn = (option: {
+    productName: string;
+    nsx: string;
+    price: number;
+    sale: number;
+    percentSale: number;
+    description: string;
+    productID: string;
+    type: string;
+    count: {
+      id: string;
+      color: string;
+      count: number;
+      remaining: number;
+      imgURL: string;
+      codeColor: string;
+    }[];
+  }) => {
+    dispatch<Action>(actionCreateProduct(option));
+  };
+  const showColor = (
+    count: {
+      id: string;
+      color: string;
+      count: number;
+      remaining: number;
+      imgURL: string;
+      codeColor: string;
+    }[]
+  ) => {
+    let result: string = count.reduce(
+      (sum, it) => (sum = sum + `${it.color}(${it.remaining}) ,`),
+      ""
+    );
+    return result;
+  };
+  const handleDeleteProduct = (id: string) => {
+    dispatch<Action>(actionDeleteProduct({ account: user.account, id: id }));
+  };
+  console.log(page.listData);
   return (
     <div className={clsx(styles.wrapper_product, "p-4")}>
       {isCreate ? (
-        <CreateProduct handleToggleCreate={handleToggleCreate} />
+        <EditProduct
+          handleToggleCreate={handleToggleCreate}
+          title={"thêm sản phẩm"}
+          contentBtn={"thêm sản phẩm"}
+          submitBtn={submitBtn}
+          id={"0"}
+        />
       ) : (
         ""
       )}
@@ -44,7 +113,10 @@ function Product() {
           trang : {page.pageIndex} / {page.sumPage}
         </div>
         {!isCreate ? (
-          <button className="capitalize bg-amber-500 py-1 px-2 text-black rounded-lg font-bold text-sm" onClick={handleToggleCreate}>
+          <button
+            className="capitalize bg-amber-500 py-1 px-2 text-black rounded-lg font-bold text-sm"
+            onClick={handleToggleCreate}
+          >
             thêm sản phẩm
           </button>
         ) : (
@@ -65,28 +137,41 @@ function Product() {
           <th>số lượng còn lại đã bán</th>
           <th>màu sắc</th>
           <th>giá</th>
-
           <th>giá khuyễn mại</th>
           <th style={{ minWidth: "100px" }}>xem chi tiết</th>
+          <th style={{ minWidth: "100px" }}>xóa</th>
         </thead>
         <tbody>
           {page.listData.map((it, index) => (
-            <tr>
+            <tr key={it.id}>
               <td>{index + 1}</td>
-              <td>123abc</td>
-              <td>iphone 12</td>
-              <td>2</td>
-              <td>2</td>
-              <td>blue (1),black(1)</td>
-              <td>2000000</td>
-              <td>2000000</td>
+              <td>{it.id}</td>
+              <td>{it.productName}</td>
+              <td>
+                {it.count.reduce((sum, item) => (sum += +item.remaining), 0)}
+              </td>
+              <td>
+                {it.count.reduce((sum, item) => (sum += +item.count), 0) -
+                  it.count.reduce((sum, item) => (sum += +item.remaining), 0)}
+              </td>
+              <td>{showColor(it.count)}</td>
+              <td>{VND.format(+it.price)}</td>
+              <td>{VND.format(+it.sale)}</td>
               <td style={{ minWidth: "100px" }}>
                 <Link
-                  to=""
-                  className="hover:text-black text-white p-2  rounded-md bg-amber-500 font-semibold"
+                  to={`/admin/product/${it.id}`}
+                  className="hover:text-black text-white p-2 capitalize rounded-md bg-amber-500 font-semibold"
                 >
                   chi tiết
                 </Link>
+              </td>
+              <td>
+                <button
+                  className="hover:text-black text-white p-2  rounded-md bg-amber-500 font-semibold capitalize"
+                  onClick={() => handleDeleteProduct(it.id)}
+                >
+                  xóa
+                </button>
               </td>
             </tr>
           ))}

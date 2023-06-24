@@ -7,10 +7,10 @@ const listNSX = [
     id: 2,
     name: "samsung",
   },
-  {
-    id: 3,
-    name: "khác",
-  },
+  // {
+  //   id: 3,
+  //   name: "khác",
+  // },
   {
     id: 4,
     name: "sony",

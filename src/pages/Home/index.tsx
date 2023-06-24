@@ -14,10 +14,10 @@ import {
   news,
   trendSearch,
 } from "./dataUI";
-import { FaAngleRight, FaAngleLeft } from "react-icons/fa";
+import { FaAngleRight, FaAngleLeft, FaArrowUp } from "react-icons/fa";
 import { useEffect, useState } from "react";
-import { data } from "~/db";
-import ProductSale from "./components/ProductSale";
+// import { data } from "~/db";
+import Products from "./components/Products";
 import BannerScale from "~/components/BannerScale";
 import BannerMove from "~/components/BannerMove";
 import ButtonCustom from "~/components/ButtonCustom";
@@ -29,33 +29,56 @@ import banner2 from "~/assets/imgs/homebanner_2_img.jpg";
 import Button from "@mui/material/Button";
 import bannerNews from "~/assets/imgs/home_collection_3_banner.jpg";
 import { VND, convertText } from "~/function";
-import { Link } from "react-router-dom";
-import ButtonContact from "~/components/ButtonContact";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { listProductSE } from "~/rootSaga/selectors";
+import ButtonBackToTop from "~/components/ButtonBackToTop";
 function Home() {
+  const listProduct = useSelector(listProductSE);
+  const navigate = useNavigate();
   // state
   const [slide, setSlide] = useState({
     index: 1,
     imgURL: "",
   });
-
+  const [dataSlideFlycam, setDataSlideFlycam] = useState(listProduct);
   const [statusBtnControl, setStatusBtnControl] = useState(0);
   const [categoryType, setCategoryType] = useState({
     type: "phone",
-    listData: data.slice(0, 10),
+    listData: listProduct.filter((it) => it.type === "phone").slice(0, 10),
   });
   const [categoryLuxury, setCategoryLuxury] = useState({
-    type: "androidTV",
-    listData: data.slice(0, 10),
+    type: "tv",
+    listData: listProduct.filter((it) => it.type === "tv").slice(0, 10),
   });
+  const [indexSlideFlycam, setIndexSlideFlycam] = useState(0);
   const [slideFlyCam, setSlideFlyCam] = useState({
-    index: 0,
-    listData: data.slice(0, 12),
+    totalSlide: Math.ceil(dataSlideFlycam.length / 12),
+    listData: dataSlideFlycam.slice(
+      indexSlideFlycam * 12,
+      (indexSlideFlycam + 1) * 12
+    ),
   });
   const [newsCategory, setNewsCategory] = useState({
     main: news.filter((it) => it.isMain)[0],
     listData: news.slice(1, 5),
   });
+  const [dataComponents, setDataComponents] = useState({
+    productSale: listProduct.filter((it) => +it.sale),
+  });
   //  effect
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  useEffect(() => {
+    setSlideFlyCam({
+      ...slideFlyCam,
+      listData: dataSlideFlycam.slice(
+        indexSlideFlycam * 12,
+        (indexSlideFlycam + 1) * 12
+      ),
+    });
+  }, [indexSlideFlycam]);
   useEffect(() => {
     const slideFind = slides.filter((it) => it.id === slide.index)[0];
     setSlide({
@@ -65,14 +88,49 @@ function Home() {
   }, [slide.index]);
   useEffect(() => {
     // ------ filter by category
-    if (categoryType.type === "tablet") {
-      setCategoryType({
-        ...categoryType,
-        listData: categoryType.listData.reverse(),
-      });
-    }
+
+    const newListData = listProduct
+      .filter((it) => it.type === categoryType.type)
+      .slice(0, 10);
+    setCategoryType({ ...categoryType, listData: newListData });
   }, [categoryType.type]);
+  useEffect(() => {
+    // ------ filter by category
+    const newListData = listProduct
+      .filter((it) => it.type === categoryLuxury.type)
+      .slice(0, 10);
+    setCategoryLuxury({ ...categoryLuxury, listData: newListData });
+  }, [categoryLuxury.type]);
+  const [isShowBtnToTop, setIsShowBtnToTop] = useState(false);
+  useEffect(() => {
+    window.addEventListener("scroll", () => {
+      if (window.pageYOffset > 300) {
+        console.log(window.pageYOffset, 1);
+        setIsShowBtnToTop(true);
+      } else {
+        setIsShowBtnToTop(false);
+      }
+    });
+  }, []);
   // function
+  const handleNextSlideFlycam = (): void => {
+    const indexEnd = slideFlyCam.totalSlide - 1;
+    if (indexEnd === indexSlideFlycam) {
+      setIndexSlideFlycam(0);
+    } else {
+      setIndexSlideFlycam(indexSlideFlycam + 1);
+    }
+  };
+
+  const handlePrevSlideFlycam = (): void => {
+    const indexEnd = slideFlyCam.totalSlide - 1;
+    if (indexSlideFlycam === 0) {
+      setIndexSlideFlycam(indexEnd);
+    } else {
+      setIndexSlideFlycam(indexSlideFlycam - 1);
+    }
+  };
+  //-----------
   const handleNextSlide = (): void => {
     const indexEnd = slides.length;
     if (indexEnd === slide.index) {
@@ -105,9 +163,11 @@ function Home() {
   const handleOnClickCategoryLuxury = (type: string) => {
     setCategoryLuxury({ ...categoryLuxury, type: type });
   };
+
   return (
     <div className={clsx(styles.wrapper)}>
-      <Header isShowNav = {true} />
+      <ButtonBackToTop isShowBtnToTop={isShowBtnToTop} />
+      <Header isShowNav={true} />
       {/* -------------- */}
       <div className={clsx(styles.banner, "w-full px-4")}>
         <div className={clsx(styles.banner_top, "flex gap-4")}>
@@ -146,6 +206,7 @@ function Home() {
                 if (it.id === slide.index) {
                   return (
                     <span
+                      key={it.id}
                       className={clsx(
                         styles.dot,
                         "w-4 h-2 rounded-full bg-amber-500 inline-block"
@@ -155,6 +216,7 @@ function Home() {
                 }
                 return (
                   <span
+                    key={it.id}
                     className={clsx(
                       styles.dot,
                       "w-2 h-2 rounded-full bg-gray-500 inline-block"
@@ -184,7 +246,7 @@ function Home() {
         </div>
       </div>
       {/* ----------------------- */}
-      <ProductSale
+      <Products
         title={"SẢN PHẨM KHUYẾN MÃI"}
         childrenTop={
           <div className="flex gap-2">
@@ -206,15 +268,23 @@ function Home() {
             </div>
           </div>
         }
-        buttonBottom={<ButtonCustom title={"sản phẩm khuyến mãi"} />}
+        buttonBottom={
+          <ButtonCustom
+            title={"sản phẩm khuyến mãi"}
+            onClick={() => {
+              navigate(`/search-category/product-sale`);
+            }}
+          />
+        }
         dataUI={{
           bgColorWrapper: "rgb(131, 23, 19)",
           bgColorItem: "#fff",
           colorTitle: "#fff",
         }}
+        data={dataComponents.productSale}
       />
       {/* ---------------------- */}
-      <ProductSale
+      {/* <Products
         title={"TOP SẢN PHẨM BÁN CHẠY"}
         childrenTop={""}
         buttonBottom={""}
@@ -223,37 +293,39 @@ function Home() {
           bgColorItem: "#fff",
           colorTitle: "#000",
         }}
-      />
+        data={dataComponents.productSale}
+      /> */}
       {/* --------------------- */}
-      <div className="w-full px-4 mt-16">
+      {/* <div className="w-full px-4 mt-16">
         <div className="w-full bg-white rounded flex flex-col ">
           <div className="w-full p-5 uppercase text-2xl font-bold">
             <h2>danh mục nổi bật</h2>
           </div>
           <div className="flex flex-wrap">
             {category.map((it) => (
-              <div
+              <Link
+                to={it.path}
                 style={{ width: "calc(100% / 7" }}
                 key={it.id}
                 className={clsx(styles.category_item)}
               >
                 <img src={it.imgURL} />
                 <span>{it.title}</span>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
-      </div>
+      </div> */}
       {/* -------------------- */}
-      <div className="w-full px-4 mt-10">
+      {/* <div className="w-full px-4 mt-10">
         <div className="w-full flex gap-8">
           {bannerSuggest.map((it) => (
-            <BannerMove imgURL={it.imgURL} />
+            <BannerMove key={it.id} imgURL={it.imgURL} />
           ))}
         </div>
-      </div>
-      {/* ----------- */}
-      <div className="w-full px-4 mt-16">
+      </div> */}
+      {/* ----------- album product new */}
+      {/* <div className="w-full px-4 mt-16">
         <div className="w-full">
           <HeaderCategory
             listButton={listBtnCategory}
@@ -267,21 +339,24 @@ function Home() {
             </div>
             <div className="flex flex-wrap w-3/4 gap-4">
               {categoryType.listData.map((it) => (
-                <div
-                  style={{ width: "calc(20% - 16px", backgroundColor: "#fff" }}
-                >
+                <div className={clsx(styles.wrapper_product_album)}>
                   <ItemProduct key={it.id} data={it} />
                 </div>
               ))}
             </div>
           </div>
           <div className="w-full flex justify-center items-center">
-            <ButtonCustom title={categoryType.type} />
+            <ButtonCustom
+              title={categoryType.type}
+              onClick={() => {
+                navigate(`/search-category/${categoryType.type}`);
+              }}
+            />
           </div>
         </div>
-      </div>
-      {/* ---------- */}
-      <div className="w-full px-4 mt-16">
+      </div> */}
+      {/* ---------- product luxury */}
+      {/* <div className="w-full px-4 mt-16">
         <div className="w-full">
           <HeaderCategory
             listButton={listBtnLuxury}
@@ -299,9 +374,9 @@ function Home() {
             ))}
           </div>
         </div>
-      </div>
-      {/* ------- */}
-      <div className="w-full px-4 mt-16">
+      </div> */}
+      {/* ------- banner */}
+      {/* <div className="w-full px-4 mt-16">
         <div className="w-full flex">
           <div className="w-1/2 pr-4">
             <BannerMove imgURL={banner1} />
@@ -310,9 +385,9 @@ function Home() {
             <BannerMove imgURL={banner2} />
           </div>
         </div>
-      </div>
+      </div> */}
       {/*  */}
-      <div className="w-full px-4 mt-16">
+      {/* <div className="w-full px-4 mt-16">
         <div className="w-full bg-white px-4 py-5 rounded">
           <div className="flex mb-5">
             <div className="w-1/2 text-2xl capitalize font-bold">
@@ -324,13 +399,13 @@ function Home() {
               <Button
                 className={clsx(styles.btn_control)}
                 // disabled={!slide.index}
-                onClick={handlePrevSlide}
+                onClick={handlePrevSlideFlycam}
               >
                 <FaAngleLeft />
               </Button>
               <Button
                 className={clsx(styles.btn_control)}
-                onClick={handleNextSlide}
+                onClick={handleNextSlideFlycam}
                 // disabled={slide.index === slide.slide.length - 1}
               >
                 <FaAngleRight />
@@ -341,7 +416,7 @@ function Home() {
             {slideFlyCam.listData.map((it) => (
               <div key={it.id} className={clsx(styles.flyCamItem, "flex")}>
                 <div className="p-2">
-                  <img src={it.productIMG[0].imgURL} />
+                  <img src={it.count[0].imgURL} />
                 </div>
                 <div className="py-2 pl-1 flex-grow">
                   <span className={clsx(styles.product_name)}>
@@ -381,9 +456,9 @@ function Home() {
             ))}
           </div>
         </div>
-      </div>
+      </div> */}
       {/* --------- news */}
-      <div className="w-full px-4 mt-16">
+      {/* <div className="w-full px-4 mt-16">
         <div className="w-full flex gap-7 ">
           <div className="w-3/4 bg-white rounded p-4">
             <div className="flex">
@@ -413,7 +488,7 @@ function Home() {
               </div>
               <div className="w-1/2 flex flex-col pl-2 gap-4 h-full">
                 {newsCategory.listData.map((it) => (
-                  <div className="w-full flex gap-4">
+                  <div key={it.id} className="w-full flex gap-4">
                     <div className="w-1/3 overflow-hidden">
                       <BannerScale imgURL={it.imgURL} />
                     </div>
@@ -435,9 +510,9 @@ function Home() {
             <img src={bannerNews} className="rounded" />
           </div>
         </div>
-      </div>
+      </div> */}
       {/* ---------- trend search */}
-      <div className="w-full px-4 mt-16">
+      {/* <div className="w-full px-4 mt-16">
         <div className="w-full bg-white rounded flex ">
           <div className="w-1/5 flex flex-col justify-center items-center px-4">
             <h2 className="capitalize text-lg font-bold">xu hướng tìm kiếm</h2>
@@ -447,23 +522,20 @@ function Home() {
           </div>
           <div className="flex w-4/5">
             {trendSearch.map((it) => (
-              <div
+              <Link
+                to={it.path}
                 style={{ width: "calc(100% / 8)" }}
                 key={it.id}
                 className={clsx(styles.category_item)}
               >
                 <img src={it.imgURL} />
                 <span>{it.title}</span>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
-      </div>
-      {/* --------- */}
-      <div className = {clsx(styles.btn_contact)}>
-        <ButtonContact />
-      </div>
-      <Footer />
+      </div> */}
+      {/* <Footer /> */}
       {/* ----------- */}
     </div>
   );

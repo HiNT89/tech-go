@@ -28,8 +28,9 @@ function Pagination({
         ) : (
           ""
         )}
-        {numberToArray(page.sumPage).map((it) => (
+        {numberToArray(page.sumPage).map((it, index) => (
           <button
+            key={index}
             className={clsx(
               "w-8 h-8 border flex justify-center items-center text-lg font-bold hover:bg-blue-600 hover:text-white",
               it === page.pageIndex ? "bg-amber-400 text-white" : ""

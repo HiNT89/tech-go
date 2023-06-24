@@ -6,6 +6,7 @@ import Search from "~/pages/Search";
 import Cart from "~/pages/Cart";
 import Detail from "~/pages/Detail";
 import Admin from "~/pages/Admin";
+import Order from "~/pages/Order";
 const publicRoutes = [
   { path: configRoutes.home, component: Home },
   { path: configRoutes.admin, component: Admin },
@@ -15,8 +16,11 @@ const publicRoutes = [
   { path: configRoutes.managerProductDetail, component: Admin },
   { path: configRoutes.orderDetail, component: Admin },
   { path: configRoutes.product, component: Product },
+  { path: configRoutes.productShort, component: Product },
   { path: configRoutes.detailProduct, component: Detail },
   { path: configRoutes.search, component: Search },
+  { path: configRoutes.searchType, component: Search },
   { path: configRoutes.cart, component: Cart },
+  { path: configRoutes.orderUser, component: Order },
 ];
 export default publicRoutes;

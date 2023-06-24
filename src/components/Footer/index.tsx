@@ -202,7 +202,9 @@ function Footer() {
                 <ul className="list-disc">
                   {it.list.map((item) => (
                     <li className="mb-2">
-                      <a className="w-full cursor-pointer hover:text-blue-500 text-sm font-normal">{item.title}</a>
+                      <a className="w-full cursor-pointer hover:text-blue-500 text-sm font-normal">
+                        {item.title}
+                      </a>
                     </li>
                   ))}
                 </ul>

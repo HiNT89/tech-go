@@ -7,8 +7,8 @@ function Empty() {
         <b>Không tìm thấy nội dung bạn yêu cầu</b>
       </div>
       <p className="py-3 text-sm font-normal text-center">
-        Không tìm thấy <b>"hieu"</b>. Vui lòng kiểm tra chính tả, sử dụng các từ
-        tổng quát hơn và thử lại!
+        Không tìm thấy . Vui lòng kiểm tra chính tả, sử dụng các từ tổng quát
+        hơn và thử lại!
       </p>
     </main>
   );

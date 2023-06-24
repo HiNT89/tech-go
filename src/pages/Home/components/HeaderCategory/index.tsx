@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { data } from "~/db";
 import clsx from "clsx";
 type HeaderCategoryProps = {
   title: string;

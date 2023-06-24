@@ -1,10 +1,12 @@
-import { Button, createStyles } from "@mui/material";
+import { Avatar, Button } from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
 import bgTop from "~/assets/imgs/topbar_img.jpg";
+import bgTopMb from "~/assets/imgs/bgtop_mb.jpg";
 import styles from "./Header.module.scss";
+import "./style.css";
 import clsx from "clsx";
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import {
@@ -13,29 +15,64 @@ import {
   FaChevronDown,
   FaAlignJustify,
   FaPlus,
-  FaRegWindowMinimize,
   FaBackspace,
   FaMinus,
+  FaBars,
+  FaStream,
 } from "react-icons/fa";
-import { VND, convertText } from "~/function";
+import {
+  VND,
+  convertText,
+  removeVietnameseTones,
+  filterProductCart,
+} from "~/function";
 import NavBoxText from "./NavBoxText";
-import { listBoxText, listNav } from "./dataMap";
+import { listBoxText, listNav } from "./dataUI";
 import NavItem from "./NavItem";
 import ResultSearchItem from "./ResultSearch";
-import { data } from "~/db";
 import HeadlessTippy from "@tippyjs/react/headless";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import Loading from "../Loading";
-import pr1 from "~/assets/imgs/pr1.jpg";
-import pr2 from "~/assets/imgs/pr2.jpg";
+import { useDispatch, useSelector } from "react-redux";
+import { cartSE, listProductSE, userSE } from "~/rootSaga/selectors";
+import ButtonDiscoloration from "../ButtonDiscoloration";
+
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import {
+  actionCreateDataCart,
+  actionDeleteDataCart,
+  actionGetDataCart,
+  actionGetDataOrder,
+  actionUpdateDataCart,
+  actionLogin,
+  actionLogout,
+  actionCreateUser,
+} from "~/pages/saga/action";
+import { signInFacebook, signInGoogle } from "./firebase";
+import Authentication from "./Authentication";
+import NavMobile from "./NavMobile";
 type HeaderProps = {
   isShowNav: boolean;
   toggleNav?: any;
 };
+interface Action {
+  type: string;
+  payload: any;
+}
 function Header({ isShowNav, toggleNav }: HeaderProps) {
+  const navigation = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector(userSE);
+  const cart = useSelector(cartSE);
+  const listProduct = useSelector(listProductSE);
   //state
+  const [isLoginByUsername, setIsLoginByUsername] = useState(false);
   const [isBanner, setIsBanner] = useState(true);
+  const [listProductCart, setListProductCart] = useState(
+    filterProductCart(cart, listProduct)
+  );
   const [isShowMiddleRight, setIsShowMiddleRight] = useState({
     login: false,
     shopCart: false,
@@ -51,35 +88,26 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
     result: "default",
     listData: [
       {
-        id: 3,
-        productName: "iPhone 11 64GB",
-        nsx: "apple",
-        price: "1200000",
-        sale: "1199999",
-        productIMG: [
+        productName: "",
+        nsx: "",
+        price: 0,
+        sale: 0,
+        percentSale: 0,
+        description: "",
+        productID: "",
+        type: "",
+        count: [
           {
-            id: 1,
-            name: "blue",
-            imgURL: "",
+            id: "",
+            color: "đen",
+            count: 1,
+            remaining: 1,
+            imgURL:
+              "https://firebasestorage.googleapis.com/v0/b/techgo-b1a51.appspot.com/o/product_12_1_f5ccbd4611264aa689ade7ac66582992_343191087259479a81b8e9e878d6abd1_master.png?alt=media&token=64a68e34-88c9-4f23-8a34-5636a61de2f1",
+            codeColor: "#000",
           },
         ],
-        color: ["black", "blue"],
-        status: true,
-        percentSale: "12",
-        description:
-          "Apple iPhone 11 sở hữu cụm camera kép mặt sau, bao gồm camera góc rộng và camera góc siêu rộng. Cảm biến camera góc rộng 12MP có khả năng lấy nét tự động nhanh gấp 3 lần trong điều kiện thiếu sáng. Bên cạnh đó cảm biến góc siêu rộng cho khả năng chụp cảnh rộng gấp 4 lần, là phương tiện ghi hình tuyệt vời cho những chuyến du lịch, chụp hình nhóm. Nhanh chóng chụp ảnh, quay video, chỉnh sửa và chia sẻ ngay trên&nbsp;",
-        specifications: {
-          screen: '6.1", Liquid Retina HD, IPS LCD, 828 x 1792 Pixel',
-          cameraAfter: "12.0 MP + 12.0 MP",
-          cameraBefore: "12.0 MP",
-          ram: "4 GB",
-          cpu: "A13 Bionic",
-          gpu: "Apple GPU 4 nhân",
-          sim: "2, 1 eSIM, 1 Nano SIM",
-          power: "3110 mAh",
-          os: "iOS 14",
-          memory: "64 GB",
-        },
+        id: "1",
       },
     ],
   });
@@ -112,7 +140,12 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
     },
   ]);
   const [keySearch, setKeySearch] = useState("");
+
   // effect
+  useEffect(() => {
+    const newListProductCart = filterProductCart(cart, listProduct);
+    setListProductCart(newListProductCart);
+  }, [cart]);
   useEffect(() => {
     setNavItems(listNav.slice(0, 10));
     if (isShowAllNav) {
@@ -156,7 +189,6 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
       );
     }
   }, [navItemIndex]);
-  //function
   const a = async () => {
     await setIsShowResultSearch({
       ...isShowResultSearch,
@@ -164,8 +196,10 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
       result: "loading",
     });
     let isResult = "result";
-    const find = data.filter((it) =>
-      it.productName.toLowerCase().includes(keySearch.toLowerCase())
+    const find = listProduct.filter((it) =>
+      removeVietnameseTones(it.productName.toLowerCase()).includes(
+        removeVietnameseTones(keySearch.toLowerCase())
+      )
     );
     if (!find.length) isResult = "empty";
     setTimeout(() => {
@@ -181,6 +215,11 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
       a();
     }
   }, [keySearch]);
+  useEffect(() => {
+    dispatch<Action>(actionGetDataCart(user.account));
+    dispatch<Action>(actionGetDataOrder(user.account));
+  }, [user.account]);
+  //function
   const handleOnMouse = ({
     itemIndex,
     isShowHover,
@@ -193,27 +232,81 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
       isShowHover: isShowHover,
     });
   };
+  const loginGoogleCB = async () => {
+    const result = await signInGoogle();
+    dispatch<Action>(actionCreateUser(result));
+  };
+  const handleLoginGoogle = useCallback(loginGoogleCB, []);
+  const handleOutGoogle = useCallback(() => {
+    dispatch<Action>(actionLogout());
+  }, []);
+  const handleUpdateCartCount = (type: number, id: string) => {
+    const cartItem = cart.filter((it) => it.id === id)[0];
+    let newPayload = { account: user.account, data: cartItem };
+    // type 0 : reduce | 1  : increase
+    if (type) {
+      newPayload = {
+        ...newPayload,
+        data: { ...newPayload.data, count: newPayload.data.count + 1 },
+      };
+    } else {
+      newPayload = {
+        ...newPayload,
+        data: { ...newPayload.data, count: newPayload.data.count - 1 },
+      };
+    }
+    dispatch<Action>(actionUpdateDataCart(newPayload));
+  };
+  const handleDeleteCart = (id: string) => {
+    dispatch<Action>(
+      actionDeleteDataCart({ account: user.account, arrID: [id] })
+    );
+  };
+  const handleToCart = useCallback(() => {
+    navigation("/cart");
+  }, []);
+  const handleToAdmin = useCallback(() => {
+    navigation("/admin");
+  }, []);
+
+  const [navMb, setNavMb] = useState(-1);
+  const [classProp, setClassProp] = useState("");
+  useEffect(() => {
+    if (navMb !== -1) setClassProp(navMb ? "navMbIn" : "navMbOut");
+  }, [navMb]);
   return (
     <header className={clsx(styles.wrapper)}>
+      {isLoginByUsername ? (
+        <Authentication handleClose={() => setIsLoginByUsername(false)} />
+      ) : (
+        ""
+      )}
       {isBanner ? (
-        <div className={clsx(styles.banner_top)}>
-          <img src={bgTop} alt="banner top" className={clsx(styles.img)} />
-
+        <picture className={clsx(styles.banner_top)}>
+          <source media="(max-width: 378px)" srcSet={bgTopMb}></source>
+          {/* <img src={bgTop} alt="banner top" className={clsx(styles.img)} /> */}
+          <source
+            media="(min-width: 768px)"
+            srcSet="//theme.hstatic.net/200000516791/1000880762/14/topbar_img.jpg?v=2258"
+          ></source>
+          <img className={clsx(styles.img)} src={bgTop} alt="banner-topbar" />
           <Button
             className={clsx(styles.btn)}
             onClick={() => setIsBanner(false)}
           >
             <ClearIcon />
           </Button>
-        </div>
+        </picture>
       ) : (
         ""
       )}
-
+      <div className="capitalize">
+        <ToastContainer />
+      </div>
       <div
         className={clsx(
           styles.site,
-          "container px-4 h-8 flex justify-between items-center text-sm font-light"
+          "container  px-4 h-8 flex justify-between items-center text-sm font-light"
         )}
       >
         <div className={clsx(styles.site_left)}>
@@ -233,19 +326,39 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
           <button className={clsx("capitalize px-4 hover:text-sky-600")}>
             hệ thống cửa hàng
           </button>
-          <button
+          <Link
+            to="/order"
             className={clsx(
               "capitalize px-4 border-x-2 border-gray-900 hover:text-sky-600"
             )}
           >
             kiểm tra đơn hàng
-          </button>
+          </Link>
           <button className={clsx("capitalize px-4 hover:text-sky-600")}>
             liên hệ
           </button>
         </div>
       </div>
-      <div className={clsx(styles.middle, "container px-4 py-4 flex")}>
+      <div
+        className={clsx(styles.middle, "container px-4 py-4 flex items-center")}
+      >
+        <button
+          className={clsx(
+            styles.middle_mobile_bars,
+            "text-white p-2 text-3xl relative"
+          )}
+          onClick={() => {
+            if (navMb === -1 || navMb == 0) {
+              setNavMb(1);
+            } else {
+              setNavMb(0);
+            }
+          }}
+        >
+          {navMb === 1 ? <FaStream /> : <FaBars />}
+
+          <NavMobile classProp={classProp} />
+        </button>
         <Link
           to="/"
           className={clsx(
@@ -291,19 +404,23 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
                         </span>
                         <ul>
                           <li className="capitalize font-semibold py-1 cursor-pointer">
-                            điện thoại
+                            <Link to="/product/phone">điện thoại</Link>
                           </li>
                           <li className="capitalize font-semibold py-1 cursor-pointer">
-                            PC - máy tính đồng bộ
+                            <Link to="/product/pc">PC - máy tính đồng bộ</Link>
                           </li>
                           <li className="capitalize font-semibold py-1 cursor-pointer">
-                            laptop & macbook
+                            <Link to="/product/laptop">laptop & macbook</Link>
                           </li>
                           <li className="capitalize font-semibold py-1 cursor-pointer">
-                            đồng hồ thông minh
+                            <Link to="/product/samrtWatch">
+                              đồng hồ thông minh
+                            </Link>
                           </li>
                           <li className="capitalize font-semibold py-1 cursor-pointer">
-                            linh kiện máy tính
+                            <Link to="/product/accessory">
+                              linh kiện máy tính
+                            </Link>
                           </li>
                         </ul>
                       </div>
@@ -378,14 +495,25 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
               value={keySearch}
               onChange={(e) => setKeySearch(e.target.value)}
             />
-            <button
+            <Link
+              to={`/search/${removeVietnameseTones(
+                keySearch.toLowerCase()
+              ).replace(/ /g, "-")}`}
               className={clsx(
                 "absolute right-1 flex items-center justify-center rounded-lg",
                 styles.btn_search
               )}
+              onClick={() => {
+                setIsShowResultSearch({
+                  ...isShowResultSearch,
+                  show: false,
+                  result: "default",
+                });
+                setKeySearch("");
+              }}
             >
               <SearchIcon />
-            </button>
+            </Link>
           </div>
         </HeadlessTippy>
         <div className={clsx(styles.middle_right, "flex items-center w-1/3")}>
@@ -417,13 +545,22 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
               })
             }
           >
-            <FaUserAlt />
-            <div>
-              <span className="block text-xs">đăng nhập / đăng ký</span>
-              <span className="block flex items-center gap-1 text-xs">
-                tài khoản của tôi <FaChevronDown />
-              </span>
-            </div>
+            {user.account ? (
+              <div>
+                <Avatar alt={user.name} src={user.avatar} />
+              </div>
+            ) : (
+              <>
+                <FaUserAlt />
+                <div>
+                  <span className="block text-xs">đăng nhập / đăng ký</span>
+                  <span className="block flex items-center gap-1 text-xs">
+                    tài khoản của tôi <FaChevronDown />
+                  </span>
+                </div>
+              </>
+            )}
+
             <div
               className={clsx(
                 styles.middle_right_login,
@@ -431,16 +568,37 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
                 "p-4 z-10"
               )}
             >
-              <span className={clsx(styles.middle_right_login_triangle)}></span>
-              <h3 className={clsx("uppercase")}>đăng nhập tài khoản</h3>
-              <button>
-                <div></div>
-                <span>đăng nhập bằng facebook</span>
-              </button>
-              <button>
-                <div></div>
-                <span>đăng nhập bằng google</span>
-              </button>
+              {user.account ? (
+                <>
+                  <ButtonDiscoloration
+                    context={"trang quản trị"}
+                    handleOnClick={handleToAdmin}
+                  />
+                  <ButtonDiscoloration
+                    context={"đăng xuất"}
+                    handleOnClick={handleOutGoogle}
+                  />
+                </>
+              ) : (
+                <>
+                  <span
+                    className={clsx(styles.middle_right_login_triangle)}
+                  ></span>
+                  <h3 className={clsx("uppercase")}>đăng nhập tài khoản</h3>
+                  <ButtonDiscoloration
+                    context={"đăng nhập bằng tài khoản"}
+                    handleOnClick={() => setIsLoginByUsername(true)}
+                  />
+                  {/* <ButtonDiscoloration
+                    context={"đăng nhập bằng facebook"}
+                    handleOnClick={signInFacebook}
+                  /> */}
+                  <ButtonDiscoloration
+                    context={"đăng nhập bằng google"}
+                    handleOnClick={handleLoginGoogle}
+                  />
+                </>
+              )}
             </div>
           </button>
           <button
@@ -456,7 +614,7 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
               <div className="relative">
                 <ShoppingCartIcon />
                 <span className="absolute bg-red-600 w-4 h-4 text-xs rounded-full left-4">
-                  0
+                  {listProductCart.length}
                 </span>
               </div>
               <span>giỏ hàng</span>
@@ -464,35 +622,45 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
 
             <div
               className={clsx(
-                styles.middle_right_login,
+                styles.middle_right_cart,
                 isShowMiddleRight.shopCart ? "block" : "hidden",
                 "p-4 z-10"
               )}
             >
-              <span className={clsx(styles.middle_right_login_triangle)}></span>
+              <span className={clsx(styles.middle_right_cart_triangle)}></span>
               <h3 className={clsx("uppercase")}>giỏ hàng</h3>
-              <div className="">
-                {true ? (
+              <div className={clsx(styles.shopCartList)}>
+                {cart.length ? (
                   <a>
-                    {data.slice(0, 2).map((it) => (
+                    {listProductCart.map((it) => (
                       <div key={it.id} className="flex relative py-4 border-b">
                         <div className="w-1/4">
-                          <img src={it.productIMG[0].imgURL} />
+                          <img src={it.imgURL} />
                         </div>
                         <div className="w-3/4 pl-3 flex flex-col gap-1 items-start relative">
                           <b className="text-xs uppercase">{it.productName}</b>
-                          <span className="text-xs capitalize">
-                            {it.color[0]}
-                          </span>
+                          <span className="text-xs capitalize">{it.color}</span>
                           <div className="flex w-full">
                             <div className="flex w-1/2">
-                              <button className="bg-gray-300  w-6 h-full flex justify-center items-center hover:bg-amber-400">
+                              <button
+                                className="bg-gray-300  w-6 h-full flex justify-center items-center hover:bg-amber-400"
+                                onClick={(e) => {
+                                  handleUpdateCartCount(0, it.id);
+                                  e.stopPropagation();
+                                }}
+                              >
                                 <FaMinus />
                               </button>
                               <div className="w-8 h-full bg-white text-xl font-bold border">
-                                1
+                                {it.count}
                               </div>
-                              <button className="bg-gray-300  w-6 h-full flex justify-center items-center hover:bg-amber-400">
+                              <button
+                                className="bg-gray-300  w-6 h-full flex justify-center items-center hover:bg-amber-400"
+                                onClick={(e) => {
+                                  handleUpdateCartCount(1, it.id);
+                                  e.stopPropagation();
+                                }}
+                              >
                                 <FaPlus />
                               </button>
                             </div>
@@ -500,7 +668,13 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
                               {VND.format(+it.price * 1)}
                             </b>
                           </div>
-                          <button className="absolute top-0 text-2xl hover:text-amber-400 right-2">
+                          <button
+                            className="absolute top-0 text-2xl hover:text-amber-400 right-2"
+                            onClick={(e) => {
+                              handleDeleteCart(it.id);
+                              e.stopPropagation();
+                            }}
+                          >
                             <FaBackspace />
                           </button>
                         </div>
@@ -518,10 +692,10 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
                   </div>
                 )}
               </div>
-              <button>
-                <div></div>
-                <span>xem giỏ hàng</span>
-              </button>
+              <ButtonDiscoloration
+                context={"xem giỏ hàng"}
+                handleOnClick={handleToCart}
+              />
             </div>
           </button>
         </div>
@@ -535,7 +709,7 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
           )}
           onClick={toggleNav}
         >
-          <FaAlignJustify />{" "}
+          <FaAlignJustify />
           <span className={clsx("uppercase")}>danh mục sản phẩm</span>
           {isShowNav ? (
             <div
@@ -546,6 +720,7 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
             >
               {NavItems.map((it, index) => (
                 <NavItem
+                  link={index ? `/product/${it.type}` : "/"}
                   content={it.content}
                   isShowHover={it.isShowHover}
                   handleOnMouse={handleOnMouse}
@@ -553,17 +728,17 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
               ))}
               {isShowAllNav ? (
                 <button
-                  className="capitalize to-black flex items-center gap-2 p-2"
+                  className="capitalize to-black flex items-center gap-2 p-2 text-amber-500 ml-4"
                   onClick={(e) => {
                     setIsShowAllNav(false);
                     e.stopPropagation();
                   }}
                 >
-                  <FaRegWindowMinimize /> ẩn bớt
+                  <FaMinus /> ẩn bớt
                 </button>
               ) : (
                 <button
-                  className="capitalize to-black flex items-center gap-2 p-2"
+                  className="capitalize to-black flex items-center gap-2 p-2 text-amber-500 ml-4"
                   onClick={(e) => {
                     setIsShowAllNav(true);
                     e.stopPropagation();

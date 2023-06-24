@@ -2,23 +2,36 @@ import clsx from "clsx";
 import styles from "./Product.module.scss";
 import Header from "~/components/Header";
 import Footer from "~/components/Footer";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
 import { FaCheck, FaSort, FaSortDown } from "react-icons/fa";
 import banner from "~/assets/imgs/collection_banner.jpg";
 import { listNSX, listPrice, listSort } from "./dataUI";
-import { data } from "~/db";
 import ItemProduct from "~/components/ItemProduct";
 import ButtonCustom from "~/components/ButtonCustom";
+import { useSelector } from "react-redux";
+import { listProductSE } from "~/rootSaga/selectors";
+import Pagination from "~/components/Pagination";
+import { removeVietnameseTones } from "~/function";
+import ButtonBackToTop from "~/components/ButtonBackToTop";
+
 function Product() {
+  const { productType, product, nsx } = useParams();
   const arrFilter: string[] = [];
   const [showNav, setShowNav] = useState(false);
   const toggleShowNav = () => {
     setShowNav(!showNav);
   };
+  const limit = 10;
+  const listProduct = useSelector(listProductSE);
   const [listFilter, setListFilter] = useState(arrFilter);
+  const [data, setData] = useState(listProduct);
   const [sort, setSort] = useState("az");
-  const [listData, setListData] = useState(data.slice(0, 0));
+  const [page, setPage] = useState(1);
+  const [listData, setListData] = useState({
+    totalPage: Math.ceil(data.length / limit),
+    arrItem: data.slice((page - 1) * limit, page * limit),
+  });
   const handleCheck = (value: string) => {
     const confident = listFilter.includes(value);
     if (confident) {
@@ -27,10 +40,238 @@ function Product() {
       setListFilter([...listFilter, value]);
     }
   };
+  const handleParam = () => {
+    let newData: {
+      productName: string;
+      nsx: string;
+      price: number;
+      sale: number;
+      percentSale: number;
+      description: string;
+      productID: string;
+      type: string;
+      count: {
+        id: string;
+        color: string;
+        count: number;
+        remaining: number;
+        imgURL: string;
+        codeColor: string;
+      }[];
+      id: string;
+    }[] = [];
+    if (product && nsx) {
+      const productFormat = product.replace(/-/g, "").toLowerCase();
+      newData = listProduct.filter((it) => {
+        const name = removeVietnameseTones(it.productName).toLowerCase();
+        const confident =
+          it.type === productType &&
+          name.includes(productFormat) &&
+          it.nsx.toLowerCase() === nsx;
+        return confident;
+      });
+    } else {
+      switch (productType) {
+        case "all":
+          {
+            newData = listProduct;
+          }
+          break;
+        case "/product-sale":
+          {
+            newData = listProduct.filter((it) => it.sale);
+          }
+          break;
+        default:
+          {
+            newData = listProduct.filter(
+              (it) => it.type.toLowerCase() === productType
+            );
+          }
+          break;
+      }
+    }
+    return newData;
+  };
+  useEffect(() => {
+    setData(handleParam());
+    setPage(1);
+  }, [productType]);
+  useEffect(() => {
+    setListData({
+      totalPage: Math.ceil(data.length / limit),
+      arrItem: data.slice((page - 1) * 10, page * limit),
+    });
+  }, [page, data]);
+  useEffect(() => {
+    if (listFilter.length) {
+      const listFilterByPrice = listFilter.filter((it) =>
+        listPrice.map((item) => item.value).includes(it)
+      );
+      const listFilterByNSX = listFilter.filter((it) =>
+        listNSX
+          .map((item) => item.name.toLowerCase())
+          .includes(it.toLowerCase())
+      );
+
+      const listDataFilterByNSX = listFilterByNSX.length
+        ? handleParam().filter((it) =>
+            listFilterByNSX.includes(it.nsx.toLowerCase())
+          )
+        : handleParam();
+      const handleListFilterByPrice = (
+        item: {
+          productName: string;
+          nsx: string;
+          price: number;
+          sale: number;
+          percentSale: number;
+          description: string;
+          productID: string;
+          type: string;
+          count: {
+            id: string;
+            color: string;
+            count: number;
+            remaining: number;
+            imgURL: string;
+            codeColor: string;
+          }[];
+          id: string;
+        },
+        min: number,
+        max: number
+      ): boolean => {
+        let result = false;
+        const valuePrice = item.sale ? item.sale : item.price;
+        if (max && min) {
+          result = valuePrice >= min && valuePrice <= max ? true : false;
+        } else if (!max && min) {
+          result = valuePrice >= min ? true : false;
+        } else if (!min && max) {
+          result = valuePrice <= max ? true : false;
+        }
+        return result;
+      };
+      const newData = listFilterByPrice.length
+        ? listDataFilterByNSX.filter((item) => {
+            return listFilterByPrice
+              .map((it) => {
+                if (it === "<1000000") {
+                  return handleListFilterByPrice(item, 0, 1000000);
+                } else if (it === ">4000000") {
+                  return handleListFilterByPrice(item, 4000000, 0);
+                } else {
+                  const itFormat = +it;
+                  return handleListFilterByPrice(
+                    item,
+                    itFormat - 1000000,
+                    itFormat
+                  );
+                }
+              })
+              .some((it) => it === true);
+          })
+        : listDataFilterByNSX;
+      setData(newData);
+    } else {
+      setData(handleParam());
+    }
+  }, [listFilter]);
+  // useEffect(() => {
+  //   let newData: {
+  //     productName: string;
+  //     nsx: string;
+  //     price: number;
+  //     sale: number;
+  //     percentSale: number;
+  //     description: string;
+  //     productID: string;
+  //     type: string;
+  //     count: {
+  //       id: string;
+  //       color: string;
+  //       count: number;
+  //       remaining: number;
+  //       imgURL: string;
+  //       codeColor: string;
+  //     }[];
+  //     id: string;
+  //   }[] = data;
+  //   switch (sort) {
+  //     case "az":
+  //       {
+  //         newData = data.sort((a, b) => {
+  //           return a.productName
+  //             .toLowerCase()
+  //             .localeCompare(b.productName.toLowerCase());
+  //         });
+  //       }
+  //       break;
+  //     case "za":
+  //       {
+  //         newData = data.sort((a, b) => {
+  //           return b.productName
+  //             .toLowerCase()
+  //             .localeCompare(a.productName.toLowerCase());
+  //         });
+  //       }
+  //       break;
+  //     case "priceDown":
+  //       {
+  //         newData = data.sort((a, b) => {
+  //           const priceA = a.sale ? a.sale : a.price;
+  //           const priceB = b.sale ? b.sale : b.price;
+  //           return priceB - priceA;
+  //         });
+  //       }
+  //       break;
+  //     case "priceUp":
+  //       {
+  //         newData = data.sort((a, b) => {
+  //           const priceA = a.sale ? a.sale : a.price;
+  //           const priceB = b.sale ? b.sale : b.price;
+  //           return priceA - priceB;
+  //         });
+  //       }
+  //       break;
+  //     default:
+  //       {
+  //         newData = data.sort((a, b) => {
+  //           const countA = a.count.reduce(
+  //             (sum, it) => (sum += it.count - it.remaining),
+  //             0
+  //           );
+  //           const countB = b.count.reduce(
+  //             (sum, it) => (sum += it.count - it.remaining),
+  //             0
+  //           );
+  //           return countB - countA;
+  //         });
+  //       }
+  //       break;
+  //   }
+  //   setData([...newData]);
+  // }, [sort]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  const [isShowBtnToTop, setIsShowBtnToTop] = useState(false);
+  useEffect(() => {
+    window.addEventListener("scroll", () => {
+      if (window.pageYOffset > 300) {
+   
+        setIsShowBtnToTop(true);
+      } else {
+        setIsShowBtnToTop(false);
+      }
+    });
+  }, []);
   return (
     <>
       <Header isShowNav={showNav} toggleNav={toggleShowNav} />
-      <main className="w-full px-4 bg-gray-200">
+      <main className="w-full px-4 bg-gray-200 relative">
+      <ButtonBackToTop isShowBtnToTop={isShowBtnToTop} />
         {/* ---  */}
         <div className="w-full capitalize text-sm font-normal py-2 flex gap-2">
           <Link to="/">trang chủ</Link>
@@ -45,13 +286,16 @@ function Product() {
                 danh mục sản phẩm
               </h2>
               <div className="w-full px-3 py-2 capitalize text-sm font-medium flex flex-col gap-2">
-                <Link to="/" className="hover:text-blue-500">
+                <Link
+                  to="/product/product-sale"
+                  className="hover:text-blue-500"
+                >
                   sản phẩm khuyến mãi
                 </Link>
                 <Link to="/" className="hover:text-blue-500">
                   sản phẩm nổi bật
                 </Link>
-                <Link to="/" className="hover:text-blue-500">
+                <Link to="/product/all" className="hover:text-blue-500">
                   tất cả sản phẩm
                 </Link>
               </div>
@@ -111,10 +355,10 @@ function Product() {
               <div className="flex items-center gap-5">
                 <h2 className="text-2xl font-bold">Tất cả sản phẩm</h2>
                 <span className="text-xs">
-                  <b className="text-base">5</b> sản phẩm
+                  <b className="text-base">{data.length}</b> sản phẩm
                 </span>
               </div>
-              {listData.length ? (
+              {listData.arrItem.length ? (
                 <div
                   className={clsx(
                     styles.box_sort,
@@ -191,12 +435,9 @@ function Product() {
               )}
             </div>
             <div className="flex flex-wrap gap-2">
-              {listData.length ? (
-                listData.map((it) => (
-                  <div
-                    style={{ width: "calc(20% - 12px)" }}
-                    className=" bg-white"
-                  >
+              {listData.arrItem.length ? (
+                listData.arrItem.map((it) => (
+                  <div className={styles.wrapper_item}>
                     <ItemProduct key={it.id} data={it} />
                   </div>
                 ))
@@ -206,13 +447,22 @@ function Product() {
                 </p>
               )}
             </div>
-            {listData.length ? (
-              <div className="flex justify-center items-center">
-                <ButtonCustom title={"sản phẩm"} />
-              </div>
-            ) : (
-              ""
-            )}
+            <Pagination
+              page={{
+                pageIndex: page,
+                sumPage: listData.totalPage,
+                listData: listData.arrItem,
+              }}
+              handleChangePage={(page: number) => {
+                setPage(page);
+              }}
+              handlePrevPage={() => {
+                setPage(page - 1);
+              }}
+              handleNextPage={() => {
+                setPage(page + 1);
+              }}
+            />
           </div>
         </div>
       </main>

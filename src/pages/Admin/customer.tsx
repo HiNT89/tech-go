@@ -2,13 +2,16 @@ import clsx from "clsx";
 import styles from "./Admin.module.scss";
 import { useState } from "react";
 import Pagination from "~/components/Pagination";
-import { numberToArray } from "~/function";
-const listData = numberToArray(20);
+import { useSelector } from "react-redux";
+import { listUserSE, orderSE } from "~/rootSaga/selectors";
+import { VND } from "~/function";
 function Customer() {
+  const listUser = useSelector(listUserSE);
+  const orderData = useSelector(orderSE);
   const [page, setPage] = useState({
     pageIndex: 1,
-    listData: listData.slice(0, 5),
-    sumPage: Math.floor(listData.length / 5),
+    listData: listUser.slice(0, 5),
+    sumPage: Math.ceil(listUser.length / 5),
   });
   const handlePrevPage = () => {
     setPage({ ...page, pageIndex: page.pageIndex - 1 });
@@ -25,7 +28,6 @@ function Customer() {
         danh sách khách hàng
       </h2>
       <div className="capitalize my-4 font-semibold">
-        {" "}
         trang : {page.pageIndex} / {page.sumPage}
       </div>
       <table
@@ -46,12 +48,23 @@ function Customer() {
           {page.listData.map((it, index) => (
             <tr>
               <td>{index + 1}</td>
-              <td>nguyen trung hieu</td>
-              <td>g3 trung tu dong da ha noi</td>
-              <td>2</td>
-              <td>2000000</td>
-              <td>0962611801</td>
-              <td>2001hieunt89@gmail.com</td>
+              <td>{it.name}</td>
+              <td>{it.address}</td>
+              <td>
+                {orderData.filter((item) => item.account === it.account).length}
+              </td>
+              <td>
+                {VND.format(
+                  orderData
+                    .filter(
+                      (item) =>
+                        item.account === it.account && item.status === "delivered"
+                    )
+                    .reduce((sum, it) => (sum = sum + it.total), 0)
+                )}
+              </td>
+              <td>{it.phone}</td>
+              <td>{it.typeAccount}</td>
             </tr>
           ))}
         </tbody>

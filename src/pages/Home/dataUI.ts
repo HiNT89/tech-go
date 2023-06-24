@@ -29,14 +29,14 @@ import news2 from "~/assets/imgs/blog-2_d7c838e2794e4d0581f9a02c9d62ac3f_compact
 import news3 from "~/assets/imgs/blog-3_7960c8179e2d4d1ebe8638c9f48ac4ae_compact.jpg";
 import news4 from "~/assets/imgs/blog-4_26d28385c2d648f28ea428b37885b35f_compact.jpg";
 import news5 from "~/assets/imgs/blog-5_f41b0437ff2749b9b64cbdf5f8280eb9_compact.jpg";
-import trendSearch1 from '~/assets/imgs/categorize_1_img.jpg';
-import trendSearch2 from '~/assets/imgs/categorize_2_img.jpg';
-import trendSearch3 from '~/assets/imgs/categorize_3_img.jpg';
-import trendSearch4 from '~/assets/imgs/categorize_4_img.jpg';
-import trendSearch5 from '~/assets/imgs/categorize_5_img.jpg';
-import trendSearch6 from '~/assets/imgs/categorize_6_img.jpg';
-import trendSearch7 from '~/assets/imgs/categorize_7_img.jpg';
-import trendSearch8 from '~/assets/imgs/categorize_8_img.jpg';
+import trendSearch1 from "~/assets/imgs/categorize_1_img.jpg";
+import trendSearch2 from "~/assets/imgs/categorize_2_img.jpg";
+import trendSearch3 from "~/assets/imgs/categorize_3_img.jpg";
+import trendSearch4 from "~/assets/imgs/categorize_4_img.jpg";
+import trendSearch5 from "~/assets/imgs/categorize_5_img.jpg";
+import trendSearch6 from "~/assets/imgs/categorize_6_img.jpg";
+import trendSearch7 from "~/assets/imgs/categorize_7_img.jpg";
+import trendSearch8 from "~/assets/imgs/categorize_8_img.jpg";
 const bannerTop = [
   {
     id: 1,
@@ -87,72 +87,86 @@ const category = [
   {
     id: 1,
     title: "điện thoại",
+    path: "/product/phone",
     imgURl: category1,
   },
 
   {
     id: 2,
     title: "laptop",
+    path: "/product/laptop",
     imgURL: category2,
   },
   {
     id: 3,
     title: "tablet",
+    path: "/product/laptop",
     imgURL: category3,
   },
   {
     id: 4,
     title: "đồng hồ thông minh",
+    path: "/product/smartWatch",
     imgURL: category4,
   },
   {
     id: 5,
     title: "ốp lưng điện thoại",
+    path: "/search/op-lung",
     imgURL: category5,
   },
   {
     id: 6,
     title: "chuột máy tính",
+    path: "/search/chuot",
     imgURL: category6,
   },
   {
     id: 7,
     title: "màn hình máy tính",
+    path: "/product/screenPC",
     imgURL: category7,
   },
   {
     id: 8,
     title: "loa bluetooth",
+    path: "/search/loa-bluetooth",
     imgURL: category8,
   },
   {
     id: 9,
     title: "tai nghe",
+    path: "/search/tai-nghe",
     imgURL: category9,
   },
   {
     id: 10,
     title: "sạc dự phòng",
+    path: "/search/sac-du-phong",
     imgURL: category10,
   },
   {
     id: 11,
     title: "thiết bị mạng",
+    path: "/product/networkEquipment",
     imgURL: category11,
   },
   {
     id: 12,
     title: "bàn phím máy tình",
+    path: "/search/ban-phim",
     imgURL: category12,
   },
   {
     id: 13,
     title: "cáp sạc",
+    path: "/search/cap-sac",
     imgURL: category13,
   },
   {
     id: 14,
     title: "máy in",
+    path: "/search/may-in",
     imgURL: category14,
   },
 ];
@@ -187,7 +201,7 @@ const listBtnCategory = [
   },
   {
     id: 3,
-    type: "smartTV",
+    type: "tv",
     name: "smart tivi",
   },
   {
@@ -199,7 +213,7 @@ const listBtnCategory = [
 const listBtnLuxury = [
   {
     id: 1,
-    type: "androidTV",
+    type: "tv",
     name: "android tivi",
   },
   {
@@ -262,42 +276,50 @@ const trendSearch = [
   {
     id: 1,
     title: "điện thoại",
+    path: "/product/phone",
     imgURl: trendSearch1,
   },
 
   {
     id: 2,
     title: "laptop",
+    path: "/search/laptop",
     imgURL: trendSearch2,
   },
   {
     id: 3,
     title: "máy tính để bàn",
+    path: "/product/pc",
     imgURL: trendSearch3,
   },
   {
     id: 4,
     title: "tablet",
+    path: "/",
     imgURL: trendSearch4,
   },
   {
     id: 5,
     title: "đồng hồ thông minh",
+    path: "/product/smartWatch",
     imgURL: trendSearch5,
   },
   {
     id: 6,
     title: "thiết bị thông minh",
+    path: "/product/smartDevice",
     imgURL: trendSearch8,
   },
   {
     id: 7,
     title: "màn hình",
+    path: "/product/screenPC",
     imgURL: trendSearch6,
   },
   {
     id: 8,
     title: "phụ kiện",
+    path: "/product/accessory",
     imgURL: trendSearch7,
   },
 ];
@@ -310,5 +332,5 @@ export {
   listBtnCategory,
   listBtnLuxury,
   news,
-  trendSearch
+  trendSearch,
 };

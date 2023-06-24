@@ -1,0 +1,8 @@
+.product_wrapper {
+    width: calc(25% - 12px);
+    img {
+        width: 295px;
+        height: 327px;
+        object-fit: contain;
+    }
+}
