@@ -51,6 +51,109 @@ function Product() {
       setListFilter([...listFilter, value]);
     }
   };
+  const renderClassFilter = () => {
+    if (window.outerWidth < 1023) {
+      if (filterMobile.isShowFilterMobile === -1) return "filter_default";
+      if (filterMobile.isShowFilterMobile === 0) return "filter_hidden";
+      if (filterMobile.isShowFilterMobile === 1) return "filter_visible";
+    }
+    return "";
+  };
+  const handleFilter = (
+    data: {
+      productName: string;
+      nsx: string;
+      price: number;
+      sale: number;
+      percentSale: number;
+      description: string;
+      productID: string;
+      type: string;
+      count: {
+        id: string;
+        color: string;
+        count: number;
+        remaining: number;
+        imgURL: string;
+        codeColor: string;
+      }[];
+      id: string;
+    }[]
+  ) => {
+    let newData: {
+      productName: string;
+      nsx: string;
+      price: number;
+      sale: number;
+      percentSale: number;
+      description: string;
+      productID: string;
+      type: string;
+      count: {
+        id: string;
+        color: string;
+        count: number;
+        remaining: number;
+        imgURL: string;
+        codeColor: string;
+      }[];
+      id: string;
+    }[] = [];
+    switch (sort) {
+      case "az":
+        {
+          newData = data.sort((a, b) => {
+            return a.productName
+              .toLowerCase()
+              .localeCompare(b.productName.toLowerCase());
+          });
+        }
+        break;
+      case "za":
+        {
+          newData = data.sort((a, b) => {
+            return b.productName
+              .toLowerCase()
+              .localeCompare(a.productName.toLowerCase());
+          });
+        }
+        break;
+      case "priceDown":
+        {
+          newData = data.sort((a, b) => {
+            const priceA = a.sale ? a.sale : a.price;
+            const priceB = b.sale ? b.sale : b.price;
+            return priceB - priceA;
+          });
+        }
+        break;
+      case "priceUp":
+        {
+          newData = data.sort((a, b) => {
+            const priceA = a.sale ? a.sale : a.price;
+            const priceB = b.sale ? b.sale : b.price;
+            return priceA - priceB;
+          });
+        }
+        break;
+      default:
+        {
+          newData = data.sort((a, b) => {
+            const countA = a.count.reduce(
+              (sum, it) => (sum += it.count - it.remaining),
+              0
+            );
+            const countB = b.count.reduce(
+              (sum, it) => (sum += it.count - it.remaining),
+              0
+            );
+            return countB - countA;
+          });
+        }
+        break;
+    }
+    return newData;
+  };
   const handleParam = () => {
     let newData: {
       productName: string;
@@ -98,20 +201,22 @@ function Product() {
             newData = listProduct.filter(
               (it) => it.type.toLowerCase() === productType
             );
+            console.log(newData);
           }
           break;
       }
     }
-    return newData;
+    return handleFilter(newData);
   };
+  const [classFilter, setClassFilter] = useState("");
   useEffect(() => {
     setData(handleParam());
     setPage(1);
-  }, [productType]);
+  }, [productType, sort]);
   useEffect(() => {
     setListData({
       totalPage: Math.ceil(data.length / limit),
-      arrItem: data.slice((page - 1) * 10, page * limit),
+      arrItem: data.slice((page - 1) * limit, page * limit),
     });
   }, [page, data]);
   useEffect(() => {
@@ -184,86 +289,11 @@ function Product() {
               .some((it) => it === true);
           })
         : listDataFilterByNSX;
-      setData(newData);
+      setData(handleFilter(newData));
     } else {
       setData(handleParam());
     }
   }, [listFilter]);
-  // useEffect(() => {
-  //   let newData: {
-  //     productName: string;
-  //     nsx: string;
-  //     price: number;
-  //     sale: number;
-  //     percentSale: number;
-  //     description: string;
-  //     productID: string;
-  //     type: string;
-  //     count: {
-  //       id: string;
-  //       color: string;
-  //       count: number;
-  //       remaining: number;
-  //       imgURL: string;
-  //       codeColor: string;
-  //     }[];
-  //     id: string;
-  //   }[] = data;
-  //   switch (sort) {
-  //     case "az":
-  //       {
-  //         newData = data.sort((a, b) => {
-  //           return a.productName
-  //             .toLowerCase()
-  //             .localeCompare(b.productName.toLowerCase());
-  //         });
-  //       }
-  //       break;
-  //     case "za":
-  //       {
-  //         newData = data.sort((a, b) => {
-  //           return b.productName
-  //             .toLowerCase()
-  //             .localeCompare(a.productName.toLowerCase());
-  //         });
-  //       }
-  //       break;
-  //     case "priceDown":
-  //       {
-  //         newData = data.sort((a, b) => {
-  //           const priceA = a.sale ? a.sale : a.price;
-  //           const priceB = b.sale ? b.sale : b.price;
-  //           return priceB - priceA;
-  //         });
-  //       }
-  //       break;
-  //     case "priceUp":
-  //       {
-  //         newData = data.sort((a, b) => {
-  //           const priceA = a.sale ? a.sale : a.price;
-  //           const priceB = b.sale ? b.sale : b.price;
-  //           return priceA - priceB;
-  //         });
-  //       }
-  //       break;
-  //     default:
-  //       {
-  //         newData = data.sort((a, b) => {
-  //           const countA = a.count.reduce(
-  //             (sum, it) => (sum += it.count - it.remaining),
-  //             0
-  //           );
-  //           const countB = b.count.reduce(
-  //             (sum, it) => (sum += it.count - it.remaining),
-  //             0
-  //           );
-  //           return countB - countA;
-  //         });
-  //       }
-  //       break;
-  //   }
-  //   setData([...newData]);
-  // }, [sort]);
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -277,13 +307,16 @@ function Product() {
     } else if (window.outerWidth < 1024) {
       setLimit(9);
     } else {
+      setLimit(10);
       setFilterMobile({
         isShowFilterMobile: -1,
         isScreenMobile: false,
       });
     }
+    setClassFilter(renderClassFilter());
   }, [window.outerWidth]);
   const [isShowBtnToTop, setIsShowBtnToTop] = useState(false);
+
   useEffect(() => {
     window.addEventListener("scroll", () => {
       if (window.pageYOffset > 300) {
@@ -293,13 +326,9 @@ function Product() {
       }
     });
   }, []);
-  const renderClassFilter = () => {
-    if (filterMobile.isShowFilterMobile === -1) return "filter_default";
-    if (filterMobile.isShowFilterMobile === 0) return "filter_hidden";
-    if (filterMobile.isShowFilterMobile === 1) return "filter_visible";
-  };
+
   useEffect(() => {
-    if (filterMobile.isShowFilterMobile) {
+    if (filterMobile.isShowFilterMobile === 1) {
       setIsDisableScroll(true);
     } else {
       setIsDisableScroll(false);
@@ -321,10 +350,7 @@ function Product() {
         {/* ---- */}
         <div className={clsx(styles.wrapper_content, "flex p-6 relative")}>
           <div
-            className={clsx(
-              renderClassFilter(),
-              "w-1/5 h-full flex flex-col gap-3"
-            )}
+            className={clsx(classFilter, "w-1/5 h-full flex flex-col gap-3")}
           >
             <div className="flex flex-col rounded bg-white">
               <h2 className="w-full p-3 capitalize text-lg font-bold border-b-2">

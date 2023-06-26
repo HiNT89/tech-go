@@ -48,6 +48,9 @@
     display: block;
   }
 }
+.nav_mobile {
+  display: none;
+}
 @media only screen and (max-width: 1023px) {
   .wrapper {
     padding-bottom: 50px;
@@ -56,6 +59,7 @@
     display: none;
   }
   .nav_mobile {
+    display: block;
     position: absolute;
     bottom: 0;
     left: 0;

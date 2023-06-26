@@ -274,19 +274,23 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
   useEffect(() => {
     if (navMb !== -1) setClassProp(navMb ? "navMbIn" : "navMbOut");
   }, [navMb]);
+  const handleClose = () => {
+    setIsLoginByUsername(false);
+    const elementBody = document.getElementsByTagName("body")[0];
+    if (elementBody != null) {
+      elementBody.classList.remove("disableScroll");
+    }
+  };
   return (
     <header className={clsx(styles.wrapper)}>
-      {isLoginByUsername ? (
-        <Authentication handleClose={() => setIsLoginByUsername(false)} />
-      ) : (
-        ""
-      )}
+      {isLoginByUsername ? <Authentication handleClose={handleClose} /> : ""}
       {isBanner ? (
         <picture className={clsx(styles.banner_top)}>
-          <source media="(max-width: 378px)" srcSet={bgTopMb}></source>
+          <source media="(max-width: 377px)" srcSet={bgTopMb}></source>
           {/* <img src={bgTop} alt="banner top" className={clsx(styles.img)} /> */}
           {/* <source media="(min-width: 767px)" srcSet={bgTop}></source> */}
-          <img className={clsx(styles.img)} src={bgTop} alt="banner-topbar" />
+          <source media="(min-width:767px)" srcSet={bgTop}></source>
+          <img className={clsx(styles.img)}   src={bgTop} alt="banner-topbar" />
           <Button
             className={clsx(styles.btn)}
             onClick={() => setIsBanner(false)}
@@ -549,7 +553,7 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
             ) : (
               <>
                 <FaUserAlt />
-                <div>
+                <div className={styles.text_account}>
                   <span className="block text-xs">đăng nhập / đăng ký</span>
                   <span className="block flex items-center gap-1 text-xs">
                     tài khoản của tôi <FaChevronDown />
@@ -572,6 +576,10 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
                     handleOnClick={handleToAdmin}
                   />
                   <ButtonDiscoloration
+                    context={"đơn hàng"}
+                    handleOnClick={() => navigation("/order")}
+                  />
+                  <ButtonDiscoloration
                     context={"đăng xuất"}
                     handleOnClick={handleOutGoogle}
                   />
@@ -584,7 +592,14 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
                   <h3 className={clsx("uppercase")}>đăng nhập tài khoản</h3>
                   <ButtonDiscoloration
                     context={"đăng nhập bằng tài khoản"}
-                    handleOnClick={() => setIsLoginByUsername(true)}
+                    handleOnClick={() => {
+                      setIsLoginByUsername(true);
+                      const elementBody =
+                        document.getElementsByTagName("body")[0];
+                      if (elementBody != null) {
+                        elementBody.classList.add("disableScroll");
+                      }
+                    }}
                   />
                   {/* <ButtonDiscoloration
                     context={"đăng nhập bằng facebook"}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import ButtonDiscoloration from "~/components/ButtonDiscoloration";
 import clsx from "clsx";
+import styles from "./Header.module.scss";
 import { removeVietnameseTones } from "~/function";
 import { useDispatch } from "react-redux";
 import { actionCreateUser, actionLogin } from "~/pages/saga/action";
@@ -109,8 +110,10 @@ function Authentication({ handleClose }: { handleClose: any }) {
 
   return (
     <div
-      className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center"
-      style={{ zIndex: "102", background: "rgba(0,0,0,0.5)" }}
+      className={clsx(
+        styles.wrapper_authen,
+        "absolute top-0 left-0 right-0 flex justify-center items-center"
+      )}
     >
       <div className="w-1/3 bg-white capitalize p-4 rounded relative">
         <button
