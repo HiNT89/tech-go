@@ -23,7 +23,7 @@ function Search() {
       it.productName.toLowerCase().includes(keySearch?.replace(/-/g, " ") || "")
     )
   );
-  const limit = 8;
+  const [limit, setLimit] = useState(8);
   const [page, setPage] = useState({
     pageIndex: [1],
     listData: data.slice(0, limit),
@@ -40,7 +40,7 @@ function Search() {
         page.pageIndex[0] * limit
       ),
     });
-  }, [page.pageIndex]);
+  }, [page.pageIndex, limit]);
   useEffect(() => {
     const newData = listProduct.filter((it) =>
       removeVietnameseTones(it.productName.toLowerCase()).includes(
@@ -62,7 +62,7 @@ function Search() {
         setPage({
           ...page,
           pageIndex: [1],
-          sumPage: Math.ceil(newData.length / 8),
+          sumPage: Math.ceil(newData.length / limit),
         });
       } else {
         const newData = listProduct.filter((it) => it.type === typeProduct);
@@ -70,11 +70,18 @@ function Search() {
         setPage({
           ...page,
           pageIndex: [1],
-          sumPage: Math.ceil(newData.length / 8),
+          sumPage: Math.ceil(newData.length / limit),
         });
       }
     }
   }, [typeProduct]);
+  useEffect(() => {
+    if (window.outerWidth < 767) {
+      setLimit(4);
+    } else if (window.outerWidth < 1024) {
+      setLimit(6);
+    }
+  }, [window.outerWidth]);
   const toggleShowNav = () => {
     setShowNav(!showNav);
   };
@@ -91,7 +98,6 @@ function Search() {
   useEffect(() => {
     window.addEventListener("scroll", () => {
       if (window.pageYOffset > 300) {
-     
         setIsShowBtnToTop(true);
       } else {
         setIsShowBtnToTop(false);
@@ -103,7 +109,7 @@ function Search() {
       <Header isShowNav={showNav} toggleNav={toggleShowNav} />
       {data.length ? (
         <main className="w-full px-4 relative">
-           <ButtonBackToTop isShowBtnToTop={isShowBtnToTop} />
+          <ButtonBackToTop isShowBtnToTop={isShowBtnToTop} />
           <div className="flex flex-col items-center gap-3 py-4">
             <h1 className="font-bold text-3xl capitalize">Tìm kiếm</h1>
             <p className="capitalize text-sm font-normal">

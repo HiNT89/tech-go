@@ -1,5 +1,7 @@
 import "./chart.scss";
 import { chartOder, chartProduct } from "./chart";
+import styles from "./Admin.module.scss";
+import clsx from "clsx";
 import { useRef } from "react";
 import { useSelector } from "react-redux";
 import { listProductSE, orderSE, listUserSE } from "~/rootSaga/selectors";
@@ -141,7 +143,7 @@ function Dashboard() {
   });
   return (
     <div className="p-4">
-      <section className="flex">
+      <section className={clsx(styles.wrapper_statistical, "flex")}>
         <div className="w-1/4 px-4">
           <div className=" bg-red-500 p-4 rounded capitalize flex flex-col text-white font-bold">
             <div className="text-xl">user</div>
@@ -187,7 +189,7 @@ function Dashboard() {
           </span>
         </div>
       </section>
-      <section className="py-4 flex">
+      <section className={clsx(styles.wrapper_charts, "py-4 flex")}>
         <div className="w-1/2 pr-2">
           <HighchartsReact
             highcharts={Highcharts}

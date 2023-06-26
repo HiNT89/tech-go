@@ -13,7 +13,7 @@ import { toast } from "react-toastify";
 import { storage } from "~/firebase/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import ButtonBackToTop from "~/components/ButtonBackToTop";
-
+import styles from "./Order.module.scss";
 interface Action {
   type: string;
   payload: any;
@@ -157,8 +157,13 @@ const Order = () => {
       <main className="flex flex-col gap-6 justify-center items-center py-6 relative">
         <ButtonBackToTop isShowBtnToTop={isShowBtnToTop} />
         <h1 className="capitalize text-3xl font-bold ">đơn hàng của bạn</h1>
-        <div className="w-full px-4 flex">
-          <div className="w-1/3 pr-2 flex flex-col items-center gap-6 capitalize bg-gray-200 p-4 rounded-md">
+        <div className="w-full px-4 flex flex-wrap">
+          <div
+            className={clsx(
+              styles.info_user,
+              "w-1/3 pr-2 flex flex-col items-center gap-6 capitalize bg-gray-200 p-4 rounded-md"
+            )}
+          >
             <h2 className="uppercase text-2xl font-semibold mb-6">
               thông tin của bạn
             </h2>
@@ -264,14 +269,15 @@ const Order = () => {
               />
             </div>
           </div>
-          <div className="w-2/3 pl-2">
-            <div className="flex gap-4 mb-6">
+          <div className={clsx(styles.list_order, "w-2/3 pl-2")}>
+            <div className="flex gap-4 mb-6 flex-wrap">
               {typeOrders.map((it) => (
                 <button
                   key={it.id}
                   className={clsx(
                     typeOrder === it ? "bg-blue-600" : "bg-amber-500",
-                    "capitalize border px-2 py-1 rounded-md text-white"
+                    "capitalize border px-2 py-1 rounded-md text-white",
+                    styles.btn_type_order
                   )}
                   onClick={() => setTypeOrder(it)}
                 >
@@ -287,7 +293,10 @@ const Order = () => {
                 >
                   <div>
                     {i.products.map((it, index) => (
-                      <div key={index} className="flex">
+                      <div
+                        key={index}
+                        className={clsx(styles.order_item, "flex flex-wrap")}
+                      >
                         <div className="w-1/6">
                           <img
                             src={filterImgProduct({
@@ -316,10 +325,10 @@ const Order = () => {
                       </div>
                     ))}
                   </div>
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-wrap justify-between items-center">
                     {typeOrders.filter((item) => item.type === i.status)[0]
                       .type === "processing" ? (
-                      <div className="w-1/3">
+                      <div className={clsx(styles.btn_cancel, "w-1/3")}>
                         <ButtonDiscoloration
                           context="hủy đơn hàng"
                           handleOnClick={() => handleDeleteOrder(i.id)}

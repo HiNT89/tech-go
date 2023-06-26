@@ -173,7 +173,10 @@
 .middle_mobile_bars {
   display: none;
 }
-@media all and (max-width: 376px) {
+@media all and (max-width: 1024px) {
+  .toast {
+    width: 50vw;
+  }
   .site {
     display: none !important;
   }
@@ -213,7 +216,7 @@
   }
   .result_search {
     left: 0px;
-    width: 340px;
+    width: 100vw;
     max-height: 300px;
     overflow: auto;
   }

@@ -2,7 +2,7 @@ import saleIMG from "~/assets/imgs/sale.png";
 import { FaShoppingBasket, FaRegEye } from "react-icons/fa";
 import clsx from "clsx";
 import styles from "./ItemProduct.module.scss";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { VND, convertText } from "~/function";
 import defaultIMG from "~/assets/imgs/hint.jpg";
 import { Link } from "react-router-dom";
@@ -30,6 +30,12 @@ type ItemProps = {
 const ItemProduct = ({ data }: ItemProps) => {
   const { id, productName, price, sale, percentSale, nsx, count } = data;
   const [isMouseLeave, setIsMouseLeave] = useState(false);
+  const [numberCharts, setNumberCharts] = useState(30);
+  useEffect(() => {
+    if (window.outerWidth < 1024) {
+      setNumberCharts(20);
+    }
+  }, [window.outerWidth]);
   return (
     <Link
       to={`/detail-product/${id}`}
@@ -65,7 +71,7 @@ const ItemProduct = ({ data }: ItemProps) => {
       <div className="px-3 flex flex-col gap-1 capitalize">
         <span className="uppercase text-gray-500 text-xs">{nsx}</span>
         <span className={clsx(styles.product_name)}>
-          {convertText(productName,30)}
+          {convertText(productName, numberCharts)}
         </span>
         <span className="text-gray-500">+ {count.length} màu sắc</span>
         <div className="flex justify-between items-center">

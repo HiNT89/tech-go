@@ -9,7 +9,7 @@ function NavMobile({ classProp }: { classProp: string }) {
         zIndex: "150",
         maxHeight: "60vh",
         left: "-16px",
-        width: "375px",
+        width: "100vw",
       }}
       className={clsx(
         classProp,

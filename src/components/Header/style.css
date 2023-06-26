@@ -10,7 +10,7 @@
 }
 @keyframes in {
   from {
-    transform: translate(-370px, 100%);
+    transform: translate(-100vw, 100%);
     /* display: none; */
   }
   to {
@@ -20,7 +20,7 @@
 }
 @keyframes out {
   to {
-    transform: translate(-390px, 100%);
+    transform: translate(-110vw, 100%);
     /* display: none; */
   }
   from {

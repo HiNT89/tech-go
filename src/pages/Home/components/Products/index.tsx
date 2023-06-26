@@ -72,11 +72,13 @@ function Products({
     }
   };
   useEffect(() => {
-    if (window.outerWidth < 376) {
+    if (window.outerWidth < 767) {
       setLimit(2);
+    } else if (window.outerWidth < 1024) {
+      setLimit(3);
     }
-  }, []);
-  console.log(slide.listData, slide.slide);
+  }, [window.outerWidth]);
+
   return (
     <div className={clsx(styles.product_sale_wrapper, "w-full px-4 mt-14")}>
       <div
@@ -88,11 +90,11 @@ function Products({
       >
         <div
           className={clsx(
-            styles.product_sale_top,
+            styles.product_top,
             "flex justify-between text-white w-full mb-4"
           )}
         >
-          <div className="w-3/4 flex gap-4 items-center">
+          <div className="w-3/4 flex gap-4 items-center flex-wrap">
             <h2
               style={{ color: `${dataUI.colorTitle}` }}
               className="uppercase text-2xl"
@@ -101,7 +103,12 @@ function Products({
             </h2>
             {childrenTop}
           </div>
-          <div className="flex gap-4 w-1/4 justify-end">
+          <div
+            className={clsx(
+              "flex gap-4 w-1/4 justify-end",
+              styles.btn_controls
+            )}
+          >
             <Button
               className={clsx(styles.btn_control)}
               disabled={!slide.index}

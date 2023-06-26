@@ -105,20 +105,20 @@ type stateParameters = {
 };
 const initState: stateParameters = {
   user: {
-    // account: "",
-    // typeAccount: "",
-    // name: "",
-    // avatar: "",
-    // address: "",
-    // phone: "",
-    // password: "",
-    account: "1",
+    account: "",
     typeAccount: "",
-    name: "1",
-    avatar: "1",
-    address: "1",
-    phone: "1",
-    password: "1",
+    name: "",
+    avatar: "",
+    address: "",
+    phone: "",
+    password: "",
+    // account: "1",
+    // typeAccount: "",
+    // name: "1",
+    // avatar: "1",
+    // address: "1",
+    // phone: "1",
+    // password: "1",
   },
   listProduct: [
     {

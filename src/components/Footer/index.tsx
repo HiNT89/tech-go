@@ -9,6 +9,8 @@ import {
   FaMapMarkerAlt,
   FaPhone,
 } from "react-icons/fa";
+import styles from "./Footer.module.scss";
+import clsx from "clsx";
 function Footer() {
   const listSocial = [
     {
@@ -120,7 +122,7 @@ function Footer() {
   return (
     <footer>
       {/* --------- */}
-      <div className="w-full px-4 mt-16 bg-blue-600">
+      <div className={clsx(styles.email, "w-full px-4 mt-16 bg-blue-600")}>
         <div className="w-full flex py-4 text-white ">
           <div className="w-1/2 pr-2">
             <div className="flex gap-4 capitalize items-center justify-end text-2xl font-bold">
@@ -151,7 +153,7 @@ function Footer() {
       </div>
       {/* ----------- */}
       <div className="w-full bg-white flex flex-col px-4 pt-10">
-        <div className="flex border-b-2 py-4">
+        <div className={clsx(styles.info_top, "flex border-b-2 py-4")}>
           <div className="w-1/2 flex gap-3 pr-2">
             <div className="w-1/2">
               <h3 className="capitalize text-lg font-bold mb-7">về techgo</h3>

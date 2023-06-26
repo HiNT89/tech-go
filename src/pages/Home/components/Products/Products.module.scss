@@ -28,8 +28,28 @@
     height: 244px;
   }
 }
-@media only screen and (max-width: 376px) {
+@media only screen and (max-width: 767px) {
   .product_wrapper {
     width: 50%;
+  }
+  .product_top {
+    flex-wrap: wrap;
+    > div {
+      width: 100%;
+    }
+    h2 {
+      font-size: 20px;
+      width: 100%;
+    }
+    .btn_controls {
+      margin-top: 10px;
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+}
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+  .product_wrapper {
+    width: 33.33%;
   }
 }

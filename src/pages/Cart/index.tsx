@@ -180,7 +180,7 @@ function Cart() {
         {/* toast */}
 
         {/* ---- */}
-        <div className="flex">
+        <div className={clsx(styles.wrapper_content, "flex")}>
           <div className="w-2/3 pr-2 ">
             <div className="rounded-lg bg-white">
               <h2 className="w-full p-2 capitalize font-bold text-2xl border-b">
@@ -195,7 +195,7 @@ function Cart() {
                     {data.map((it) => (
                       <div
                         key={it.id}
-                        className={clsx(styles.item_product, "flex")}
+                        className={clsx(styles.item_product, "flex flex-wrap")}
                       >
                         <div className={clsx(styles.item_product_left)}>
                           <div

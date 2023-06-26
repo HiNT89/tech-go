@@ -91,7 +91,6 @@ function Product() {
   const handleDeleteProduct = (id: string) => {
     dispatch<Action>(actionDeleteProduct({ account: user.account, id: id }));
   };
-  console.log(page.listData);
   return (
     <div className={clsx(styles.wrapper_product, "p-4")}>
       {isCreate ? (

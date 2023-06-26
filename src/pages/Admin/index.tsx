@@ -72,6 +72,26 @@ function Admin() {
         </ul>
         <div></div>
       </nav>
+      <nav className={clsx(styles.nav_mobile, "bg-black py-4 text-white")}>
+        <h1 className="font-bold uppercase w-1/3 m-auto text-center text-white">
+          <Link to="/">techgo</Link>
+        </h1>
+        <ul className="w-2/3 justify-around flex text-lg font-semibold">
+          {navs.map((it) => (
+            <Link key={it.id} to={it.path}>
+              <li
+                className={clsx(
+                  it.name === page.name ? "text-blue-400" : "",
+                  "flex items-center gap-2 capitalize pl-3 hover:text-amber-400 cursor-pointer"
+                )}
+              >
+                <span>{it.icon}</span>
+              </li>
+            </Link>
+          ))}
+        </ul>
+        <div></div>
+      </nav>
       <main
         className={clsx(
           styles.content,

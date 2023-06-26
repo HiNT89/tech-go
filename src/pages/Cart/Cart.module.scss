@@ -14,8 +14,8 @@
     width: 20px;
     display: flex;
     align-items: center;
-    
-     svg {
+
+    svg {
       color: #fff;
       font-size: 1rem;
     }
@@ -87,5 +87,29 @@
     padding: 4px;
     border: 2px solid #ccc;
     border-radius: 4px;
+  }
+}
+@media only screen and (max-width: 1024px) {
+  .wrapper_content {
+    flex-direction: column;
+    > div {
+      width: 100%;
+      margin-bottom: 16px;
+    }
+    .item_product_right {
+      max-width: 100%;
+      width: 100%;
+      justify-content: space-between;
+      flex-direction: row;
+      margin-top: 12px;
+      > b {
+        width: 50%;
+        display: block;
+        text-align: left;
+      }
+      > div {
+        width: 50%;
+      }
+    }
   }
 }

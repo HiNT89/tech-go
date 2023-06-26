@@ -156,7 +156,7 @@ function EditProduct({
           Đóng
         </button>
       </div>
-      <div className="flex flex-wrap ">
+      <div className={clsx(styles.wrapper_list_input, "flex flex-wrap ")}>
         <label className="capitalize w-1/2 flex p-2">
           <span className="w-1/3 font-bold">tên sản phẩm :</span>
           <input
@@ -240,7 +240,7 @@ function EditProduct({
             thêm
           </button>
         </div>
-        <div className="capitalize w-full p-2">
+        <div className={clsx(styles.wrapper_table, "capitalize w-full p-2")}>
           <table>
             <thead>
               <th>STT</th>

@@ -1,0 +1,17 @@
+@media only screen and (max-width: 1024px) {
+  .email {
+    display: none;
+  }
+  .info_top {
+    flex-wrap: wrap;
+
+    gap: 20px 0px;
+    > div {
+      width: 100%;
+      flex-wrap: wrap;
+      > div {
+        width: 100%;
+      }
+    }
+  }
+}

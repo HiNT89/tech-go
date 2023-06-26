@@ -41,22 +41,28 @@ function Home() {
     index: 1,
     imgURL: "",
   });
+  const [limitCategoryType, setLimitCategoryType] = useState(10);
+  const [limitSlideFlycam, setLimitSlideFlycam] = useState(12);
   const [dataSlideFlycam, setDataSlideFlycam] = useState(listProduct);
   const [statusBtnControl, setStatusBtnControl] = useState(0);
   const [categoryType, setCategoryType] = useState({
     type: "phone",
-    listData: listProduct.filter((it) => it.type === "phone").slice(0, 10),
+    listData: listProduct
+      .filter((it) => it.type === "phone")
+      .slice(0, limitCategoryType),
   });
   const [categoryLuxury, setCategoryLuxury] = useState({
     type: "tv",
-    listData: listProduct.filter((it) => it.type === "tv").slice(0, 10),
+    listData: listProduct
+      .filter((it) => it.type === "tv")
+      .slice(0, limitCategoryType),
   });
   const [indexSlideFlycam, setIndexSlideFlycam] = useState(0);
   const [slideFlyCam, setSlideFlyCam] = useState({
-    totalSlide: Math.ceil(dataSlideFlycam.length / 12),
+    totalSlide: Math.ceil(dataSlideFlycam.length / limitSlideFlycam),
     listData: dataSlideFlycam.slice(
-      indexSlideFlycam * 12,
-      (indexSlideFlycam + 1) * 12
+      indexSlideFlycam * limitSlideFlycam,
+      (indexSlideFlycam + 1) * limitSlideFlycam
     ),
   });
   const [newsCategory, setNewsCategory] = useState({
@@ -66,6 +72,7 @@ function Home() {
   const [dataComponents, setDataComponents] = useState({
     productSale: listProduct.filter((it) => +it.sale),
   });
+
   //  effect
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -74,11 +81,11 @@ function Home() {
     setSlideFlyCam({
       ...slideFlyCam,
       listData: dataSlideFlycam.slice(
-        indexSlideFlycam * 12,
-        (indexSlideFlycam + 1) * 12
+        indexSlideFlycam * limitSlideFlycam,
+        (indexSlideFlycam + 1) * limitSlideFlycam
       ),
     });
-  }, [indexSlideFlycam]);
+  }, [indexSlideFlycam, limitSlideFlycam]);
   useEffect(() => {
     const slideFind = slides.filter((it) => it.id === slide.index)[0];
     setSlide({
@@ -91,9 +98,9 @@ function Home() {
 
     const newListData = listProduct
       .filter((it) => it.type === categoryType.type)
-      .slice(0, 10);
+      .slice(0, limitCategoryType);
     setCategoryType({ ...categoryType, listData: newListData });
-  }, [categoryType.type]);
+  }, [categoryType.type, limitCategoryType]);
   useEffect(() => {
     // ------ filter by category
     const newListData = listProduct
@@ -105,13 +112,20 @@ function Home() {
   useEffect(() => {
     window.addEventListener("scroll", () => {
       if (window.pageYOffset > 300) {
-        console.log(window.pageYOffset, 1);
         setIsShowBtnToTop(true);
       } else {
         setIsShowBtnToTop(false);
       }
     });
   }, []);
+  useEffect(() => {
+    if (window.outerWidth < 767) {
+      setLimitSlideFlycam(4);
+    } else if (window.outerWidth < 1024) {
+      setLimitSlideFlycam(8);
+      setLimitCategoryType(9);
+    }
+  }, [window.outerWidth]);
   // function
   const handleNextSlideFlycam = (): void => {
     const indexEnd = slideFlyCam.totalSlide - 1;
@@ -284,7 +298,7 @@ function Home() {
         data={dataComponents.productSale}
       />
       {/* ---------------------- */}
-      {/* <Products
+      <Products
         title={"TOP SẢN PHẨM BÁN CHẠY"}
         childrenTop={""}
         buttonBottom={""}
@@ -294,9 +308,9 @@ function Home() {
           colorTitle: "#000",
         }}
         data={dataComponents.productSale}
-      /> */}
+      />
       {/* --------------------- */}
-      {/* <div className="w-full px-4 mt-16">
+      <div className="w-full px-4 mt-16">
         <div className="w-full bg-white rounded flex flex-col ">
           <div className="w-full p-5 uppercase text-2xl font-bold">
             <h2>danh mục nổi bật</h2>
@@ -305,7 +319,6 @@ function Home() {
             {category.map((it) => (
               <Link
                 to={it.path}
-                style={{ width: "calc(100% / 7" }}
                 key={it.id}
                 className={clsx(styles.category_item)}
               >
@@ -315,17 +328,17 @@ function Home() {
             ))}
           </div>
         </div>
-      </div> */}
+      </div>
       {/* -------------------- */}
-      {/* <div className="w-full px-4 mt-10">
-        <div className="w-full flex gap-8">
+      <div className="w-full px-4 mt-10">
+        <div className={clsx(styles.wrapper_banners, "w-full flex gap-8")}>
           {bannerSuggest.map((it) => (
             <BannerMove key={it.id} imgURL={it.imgURL} />
           ))}
         </div>
-      </div> */}
+      </div>
       {/* ----------- album product new */}
-      {/* <div className="w-full px-4 mt-16">
+      <div className="w-full px-4 mt-16">
         <div className="w-full">
           <HeaderCategory
             listButton={listBtnCategory}
@@ -333,11 +346,11 @@ function Home() {
             title={"bộ sưu tập mới"}
             handleOnClickCategory={handleOnClickCategory}
           />
-          <div className="flex">
+          <div className={clsx(styles.wrapper_new_product, "flex")}>
             <div className="pr-4">
               <img src={bannerCategory} className="w-full h-full" />
             </div>
-            <div className="flex flex-wrap w-3/4 gap-4">
+            <div className="flex flex-wrap w-3/4 gap-4 md:gap-2 md:justify-around">
               {categoryType.listData.map((it) => (
                 <div className={clsx(styles.wrapper_product_album)}>
                   <ItemProduct key={it.id} data={it} />
@@ -354,9 +367,9 @@ function Home() {
             />
           </div>
         </div>
-      </div> */}
+      </div>
       {/* ---------- product luxury */}
-      {/* <div className="w-full px-4 mt-16">
+      <div className="w-full px-4 mt-16">
         <div className="w-full">
           <HeaderCategory
             listButton={listBtnLuxury}
@@ -364,19 +377,22 @@ function Home() {
             title={"Sản phẩm cao cấp"}
             handleOnClickCategory={handleOnClickCategoryLuxury}
           />
-          <div className="flex flex-wrap gap-4">
+          <div
+            className={clsx(
+              styles.wrapper_new_product,
+              "flex flex-wrap gap-4 md:gap-2"
+            )}
+          >
             {categoryLuxury.listData.map((it) => (
-              <div
-                style={{ width: "calc(20% - 16px", backgroundColor: "#fff" }}
-              >
+              <div className={clsx(styles.wrapper_product_album)}>
                 <ItemProduct key={it.id} data={it} />
               </div>
             ))}
           </div>
         </div>
-      </div> */}
+      </div>
       {/* ------- banner */}
-      {/* <div className="w-full px-4 mt-16">
+      <div className="w-full px-4 mt-16">
         <div className="w-full flex">
           <div className="w-1/2 pr-4">
             <BannerMove imgURL={banner1} />
@@ -385,9 +401,9 @@ function Home() {
             <BannerMove imgURL={banner2} />
           </div>
         </div>
-      </div> */}
+      </div>
       {/*  */}
-      {/* <div className="w-full px-4 mt-16">
+      <div className="w-full px-4 mt-16">
         <div className="w-full bg-white px-4 py-5 rounded">
           <div className="flex mb-5">
             <div className="w-1/2 text-2xl capitalize font-bold">
@@ -412,7 +428,12 @@ function Home() {
               </Button>
             </div>
           </div>
-          <div className="flex flex-wrap gap-5">
+          <div
+            className={clsx(
+              styles.flyCamItem_wrapper,
+              "flex flex-wrap gap-5 md:gap-3"
+            )}
+          >
             {slideFlyCam.listData.map((it) => (
               <div key={it.id} className={clsx(styles.flyCamItem, "flex")}>
                 <div className="p-2">
@@ -456,7 +477,7 @@ function Home() {
             ))}
           </div>
         </div>
-      </div> */}
+      </div>
       {/* --------- news */}
       {/* <div className="w-full px-4 mt-16">
         <div className="w-full flex gap-7 ">
@@ -512,7 +533,7 @@ function Home() {
         </div>
       </div> */}
       {/* ---------- trend search */}
-      {/* <div className="w-full px-4 mt-16">
+      <div className={clsx(styles.wrapper_trend_search, "w-full px-4 mt-16")}>
         <div className="w-full bg-white rounded flex ">
           <div className="w-1/5 flex flex-col justify-center items-center px-4">
             <h2 className="capitalize text-lg font-bold">xu hướng tìm kiếm</h2>
@@ -524,7 +545,7 @@ function Home() {
             {trendSearch.map((it) => (
               <Link
                 to={it.path}
-                style={{ width: "calc(100% / 8)" }}
+                // style={{ width: "calc(100% / 8)" }}
                 key={it.id}
                 className={clsx(styles.category_item)}
               >
@@ -534,8 +555,8 @@ function Home() {
             ))}
           </div>
         </div>
-      </div> */}
-      {/* <Footer /> */}
+      </div>
+      <Footer />
       {/* ----------- */}
     </div>
   );

@@ -1,8 +1,18 @@
 .product_wrapper {
-    width: calc(25% - 12px);
-    img {
-        width: 295px;
-        height: 327px;
-        object-fit: contain;
-    }
+  width: calc(25% - 12px);
+  img {
+    width: 295px;
+    height: 327px;
+    object-fit: contain;
+  }
+}
+@media only screen and (max-width: 767px) {
+  .product_wrapper {
+    width: calc(50% - 12px);
+  }
+}
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+  .product_wrapper {
+    width: calc(33% - 12px);
+  }
 }

@@ -1,1 +1,25 @@
-
+@media only screen and (max-width: 1023px) {
+  .list_order {
+    width: 100%;
+  }
+  .btn_type_order {
+    width: calc(50% - 8px);
+  }
+  .order_item {
+    > div:last-child {
+      width: 100%;
+      text-align: right;
+    }
+  }
+  .btn_cancel {
+    width: 100%;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .info_user {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+}

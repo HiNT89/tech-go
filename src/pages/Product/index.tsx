@@ -4,11 +4,17 @@ import Header from "~/components/Header";
 import Footer from "~/components/Footer";
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { FaCheck, FaSort, FaSortDown } from "react-icons/fa";
+import {
+  FaCheck,
+  FaSort,
+  FaSortDown,
+  FaFilter,
+  FaArrowLeft,
+} from "react-icons/fa";
 import banner from "~/assets/imgs/collection_banner.jpg";
 import { listNSX, listPrice, listSort } from "./dataUI";
 import ItemProduct from "~/components/ItemProduct";
-import ButtonCustom from "~/components/ButtonCustom";
+import "./style.css";
 import { useSelector } from "react-redux";
 import { listProductSE } from "~/rootSaga/selectors";
 import Pagination from "~/components/Pagination";
@@ -22,7 +28,12 @@ function Product() {
   const toggleShowNav = () => {
     setShowNav(!showNav);
   };
-  const limit = 10;
+  const [filterMobile, setFilterMobile] = useState({
+    isShowFilterMobile: -1,
+    isScreenMobile: false,
+  });
+  const [isDisableScroll, setIsDisableScroll] = useState(false);
+  const [limit, setLimit] = useState(10);
   const listProduct = useSelector(listProductSE);
   const [listFilter, setListFilter] = useState(arrFilter);
   const [data, setData] = useState(listProduct);
@@ -256,22 +267,51 @@ function Product() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+  useEffect(() => {
+    if (window.outerWidth < 767) {
+      setFilterMobile({
+        ...filterMobile,
+        isScreenMobile: true,
+      });
+      setLimit(6);
+    } else if (window.outerWidth < 1024) {
+      setLimit(9);
+    } else {
+      setFilterMobile({
+        isShowFilterMobile: -1,
+        isScreenMobile: false,
+      });
+    }
+  }, [window.outerWidth]);
   const [isShowBtnToTop, setIsShowBtnToTop] = useState(false);
   useEffect(() => {
     window.addEventListener("scroll", () => {
       if (window.pageYOffset > 300) {
-   
         setIsShowBtnToTop(true);
       } else {
         setIsShowBtnToTop(false);
       }
     });
   }, []);
+  const renderClassFilter = () => {
+    if (filterMobile.isShowFilterMobile === -1) return "filter_default";
+    if (filterMobile.isShowFilterMobile === 0) return "filter_hidden";
+    if (filterMobile.isShowFilterMobile === 1) return "filter_visible";
+  };
+  useEffect(() => {
+    if (filterMobile.isShowFilterMobile) {
+      setIsDisableScroll(true);
+    } else {
+      setIsDisableScroll(false);
+    }
+  }, [filterMobile.isShowFilterMobile]);
   return (
-    <>
+    <div className={isDisableScroll ? "disableScroll" : ""}>
       <Header isShowNav={showNav} toggleNav={toggleShowNav} />
-      <main className="w-full px-4 bg-gray-200 relative">
-      <ButtonBackToTop isShowBtnToTop={isShowBtnToTop} />
+      <main
+        className={clsx(styles.wrapper, "w-full px-4 bg-gray-200 relative")}
+      >
+        <ButtonBackToTop isShowBtnToTop={isShowBtnToTop} />
         {/* ---  */}
         <div className="w-full capitalize text-sm font-normal py-2 flex gap-2">
           <Link to="/">trang chủ</Link>
@@ -279,8 +319,13 @@ function Product() {
           <span>tất cả sản phẩm</span>
         </div>
         {/* ---- */}
-        <div className="flex p-6">
-          <div className="w-1/5 h-full flex flex-col gap-3">
+        <div className={clsx(styles.wrapper_content, "flex p-6 relative")}>
+          <div
+            className={clsx(
+              renderClassFilter(),
+              "w-1/5 h-full flex flex-col gap-3"
+            )}
+          >
             <div className="flex flex-col rounded bg-white">
               <h2 className="w-full p-3 capitalize text-lg font-bold border-b-2">
                 danh mục sản phẩm
@@ -353,6 +398,25 @@ function Product() {
             </div>
             <div className="capitalize flex py-2 items-center justify-between">
               <div className="flex items-center gap-5">
+                {filterMobile.isScreenMobile ? (
+                  <button
+                    onClick={() =>
+                      setFilterMobile({
+                        ...filterMobile,
+                        isShowFilterMobile:
+                          filterMobile.isShowFilterMobile === 1 ? 0 : 1,
+                      })
+                    }
+                  >
+                    {filterMobile.isShowFilterMobile === 1 ? (
+                      <FaArrowLeft />
+                    ) : (
+                      <FaFilter />
+                    )}
+                  </button>
+                ) : (
+                  ""
+                )}
                 <h2 className="text-2xl font-bold">Tất cả sản phẩm</h2>
                 <span className="text-xs">
                   <b className="text-base">{data.length}</b> sản phẩm
@@ -467,7 +531,7 @@ function Product() {
         </div>
       </main>
       <Footer />
-    </>
+    </div>
   );
 }
 

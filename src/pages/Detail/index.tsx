@@ -187,7 +187,12 @@ function Detail() {
   return (
     <>
       <Header isShowNav={showNav} toggleNav={toggleShowNav} />
-      <main className="w-full px-4 bg-gray-200 pb-5 relative">
+      <main
+        className={clsx(
+          styles.wrapper,
+          "w-full px-4 bg-gray-200 pb-5 relative"
+        )}
+      >
         <ButtonBackToTop isShowBtnToTop={isShowBtnToTop} />
         {/* ---  */}
         <div className="w-full capitalize text-sm font-normal py-2 flex gap-2">
@@ -196,7 +201,12 @@ function Detail() {
           <span>tất cả sản phẩm</span>
         </div>
         {/* ---- */}
-        <div className="w-full bg-white flex p-4 rounded">
+        <div
+          className={clsx(
+            styles.wrapper_info_product,
+            "w-full bg-white flex p-4 rounded"
+          )}
+        >
           <div
             className={clsx(
               styles.product_img,
@@ -276,7 +286,12 @@ function Detail() {
                 thương hiệu : <b className="text-amber-500">{product.nsx}</b>
               </span>
             </div>
-            <div className="bg-gray-200 capitalize rounded-lg p-4 flex items-center w-11/12 my-3">
+            <div
+              className={clsx(
+                styles.product_info_price,
+                "bg-gray-200 capitalize rounded-lg p-4 flex items-center w-11/12 my-3"
+              )}
+            >
               <b className="w-1/6 ">giá :</b>
 
               <b className="text-3xl w-1/3 text-right pr-3 text-red-600 font-semibold">

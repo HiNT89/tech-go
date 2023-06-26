@@ -285,10 +285,7 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
         <picture className={clsx(styles.banner_top)}>
           <source media="(max-width: 378px)" srcSet={bgTopMb}></source>
           {/* <img src={bgTop} alt="banner top" className={clsx(styles.img)} /> */}
-          <source
-            media="(min-width: 768px)"
-            srcSet="//theme.hstatic.net/200000516791/1000880762/14/topbar_img.jpg?v=2258"
-          ></source>
+          {/* <source media="(min-width: 767px)" srcSet={bgTop}></source> */}
           <img className={clsx(styles.img)} src={bgTop} alt="banner-topbar" />
           <Button
             className={clsx(styles.btn)}
@@ -300,7 +297,7 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
       ) : (
         ""
       )}
-      <div className="capitalize">
+      <div className={clsx(styles.toast, "capitalize")}>
         <ToastContainer />
       </div>
       <div
