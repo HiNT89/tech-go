@@ -601,10 +601,10 @@ function Header({ isShowNav, toggleNav }: HeaderProps) {
                       }
                     }}
                   />
-                  {/* <ButtonDiscoloration
+                  <ButtonDiscoloration
                     context={"đăng nhập bằng facebook"}
                     handleOnClick={signInFacebook}
-                  /> */}
+                  />
                   <ButtonDiscoloration
                     context={"đăng nhập bằng google"}
                     handleOnClick={handleLoginGoogle}

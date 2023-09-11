@@ -11,6 +11,7 @@ const firebaseConfig = {
   appId: "1:164532285914:web:fde68cce701ee0f2bd90e3",
   measurementId: "G-X1HBXFHHZM",
 };
+
 const app = initializeApp(firebaseConfig);
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -35,4 +36,4 @@ const storage = getStorage(app);
 const auth = getAuth(app);
 const db = getFirestore(app);
 // const dbCart = getFirestore(appCart);
-export { storage, auth, db,  };
+export { storage, auth, db };
